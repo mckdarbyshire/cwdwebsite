@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State of the Markets: Free Download | CWD Research Consulting</title>
+    <meta name="description" content="Download CWD's free 'State of the Markets' retrospective: the Iran War's oil price toll and the AI trade's financing reckoning, tracked week by week over July and August 2026.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-50: #f0fdfa; --teal-100: #ccfbf1; --teal-200: #99f6e4; --teal-300: #5eead4;
+            --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488; --teal-700: #0f766e;
+            --teal-800: #115e59; --teal-900: #134e4a; --teal-950: #042f2e;
+            --white: #ffffff; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563;
+            --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+            --radius: 8px; --radius-lg: 12px;
+            --transition: 0.2s ease; --transition-smooth: 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--white);color:var(--gray-800);line-height:1.6;font-size:16px;overflow-x:hidden;}
+
+        .nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid transparent;transition:all var(--transition-smooth);padding:0 24px;}
+        .nav.scrolled{border-bottom-color:var(--gray-200);box-shadow:var(--shadow-sm);}
+        .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px;}
+        .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:1.5rem;color:var(--teal-700);letter-spacing:-0.02em;}
+        .nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+        .nav-links a{text-decoration:none;color:var(--gray-600);font-weight:500;font-size:0.925rem;transition:color var(--transition);position:relative;padding:4px 0;}
+        .nav-links a:hover{color:var(--teal-700);}
+        .nav-cta{background:var(--teal-700);color:var(--white)!important;padding:10px 20px!important;border-radius:var(--radius);font-weight:600!important;white-space:nowrap;}
+        .nav-cta:hover{background:var(--teal-800)!important;color:var(--white)!important;}
+        .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:8px;z-index:1001;}
+        .nav-hamburger span{display:block;width:26px;height:2.5px;background:var(--gray-700);border-radius:2px;}
+        @media (max-width:768px){
+            .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:var(--white);flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:100px 32px 32px;gap:24px;box-shadow:var(--shadow-lg);transition:right var(--transition-smooth);}
+            .nav-links.open{right:0;}
+            .nav-hamburger{display:flex;}
+        }
+        .mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;opacity:0;pointer-events:none;transition:opacity var(--transition-smooth);}
+        .mobile-overlay.visible{opacity:1;pointer-events:auto;}
+
+        .hero{padding:150px 24px 90px;background:linear-gradient(160deg,#0d2b28 0%,#0f766e 55%,#115e59 100%);color:#fff;}
+        .hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.15fr 1fr;gap:56px;align-items:start;}
+        .hero-kicker{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.14);border:1px solid rgba(255,255,255,0.35);color:#fff;font-weight:700;font-size:0.8rem;padding:7px 16px;border-radius:var(--radius);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:22px;}
+        .hero h1{font-family:'Source Serif 4','Georgia',serif;font-size:clamp(2rem,3.6vw,2.75rem);font-weight:700;line-height:1.2;margin-bottom:18px;}
+        .hero h1 span{color:#7dd8cc;}
+        .hero p.dek{font-size:1.12rem;color:#d5f0ea;line-height:1.65;margin-bottom:26px;max-width:32rem;}
+        .hero-points{list-style:none;display:flex;flex-direction:column;gap:12px;margin-top:8px;}
+        .hero-points li{display:flex;gap:10px;font-size:0.95rem;color:#e5f6f1;align-items:flex-start;}
+        .hero-points li::before{content:'\2713';color:#7dd8cc;font-weight:700;flex-shrink:0;}
+
+        .capture-card{background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:32px 30px;color:var(--gray-800);}
+        .capture-card h3{font-family:'Source Serif 4',serif;font-size:1.3rem;color:var(--gray-900);margin-bottom:6px;}
+        .capture-card p.sub{font-size:0.9rem;color:var(--gray-600);margin-bottom:20px;line-height:1.5;}
+        .form-group{margin-bottom:14px;}
+        .form-group label{display:block;font-size:0.82rem;font-weight:600;color:var(--gray-700);margin-bottom:6px;}
+        .form-group input{width:100%;padding:12px 14px;border:1px solid var(--gray-300);border-radius:var(--radius);font-size:0.95rem;font-family:inherit;}
+        .form-group input:focus{outline:none;border-color:var(--teal-500);box-shadow:0 0 0 3px rgba(20,184,166,0.15);}
+        .btn-download{width:100%;background:var(--teal-700);color:#fff;font-weight:700;font-size:0.98rem;padding:14px;border:none;border-radius:var(--radius);cursor:pointer;transition:background var(--transition-smooth);}
+        .btn-download:hover{background:var(--teal-800);}
+        .capture-note{font-size:0.78rem;color:var(--gray-500);margin-top:12px;text-align:center;}
+        .success-panel{display:none;text-align:center;padding:10px 0;}
+        .success-panel h3{color:var(--teal-700);font-family:'Source Serif 4',serif;font-size:1.25rem;margin-bottom:10px;}
+        .success-panel p{font-size:0.92rem;color:var(--gray-600);margin-bottom:18px;line-height:1.55;}
+        .success-panel a.download-btn{display:inline-block;background:var(--teal-700);color:#fff;font-weight:700;padding:14px 26px;border-radius:var(--radius);text-decoration:none;}
+        .success-panel a.download-btn:hover{background:var(--teal-800);}
+
+        .preview-section{padding:80px 24px;background:var(--gray-50);}
+        .preview-inner{max-width:900px;margin:0 auto;}
+        .preview-inner h2{font-family:'Source Serif 4',serif;font-size:1.7rem;color:var(--gray-900);margin-bottom:32px;text-align:center;}
+        .preview-quote{background:#fff;border-left:3px solid var(--teal-400);border-radius:0 var(--radius-lg) var(--radius-lg) 0;padding:22px 26px;margin-bottom:20px;box-shadow:var(--shadow-sm);}
+        .preview-quote p{font-size:1rem;color:var(--gray-700);line-height:1.7;font-style:italic;margin-bottom:8px;}
+        .preview-quote .tag{font-size:0.78rem;font-weight:700;color:var(--teal-600);text-transform:uppercase;letter-spacing:0.03em;}
+
+        .footer{background:var(--teal-950);color:var(--gray-300);padding:56px 24px 28px;}
+        .footer-inner{max-width:1200px;margin:0 auto;text-align:center;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,0.08);}
+        .footer-inner a{color:var(--teal-300);text-decoration:none;font-weight:600;}
+        .footer-bottom{max-width:1200px;margin:20px auto 0;font-size:0.8rem;color:var(--gray-500);text-align:center;}
+
+        @media (max-width:800px){ .hero-inner{grid-template-columns:1fr;} }
+    </style>
+</head>
+<body>
+    <nav class="nav" id="navbar">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo" aria-label="CWD Home">CWD Consulting</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="insights-archive.html">Archive</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="podcast.html">Podcast</a></li>
+                <li><a href="mailto:chris.darbyshire@cwd-consulting.com" class="nav-cta">Contact the Team</a></li>
+            </ul>
+            <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <section class="hero">
+        <div class="hero-inner">
+            <div>
+                <span class="hero-kicker">Free Download</span>
+                <h1>Four Weeks. Two Stories the Market Couldn't <span>Look Away From.</span></h1>
+                <p class="dek">The Iran War's oil price toll, and the AI trade's financing reckoning, tracked week by week exactly as CWD wrote it at the time, not reconstructed after the fact.</p>
+                <ul class="hero-points">
+                    <li>Four dated excerpts per thread, straight from Chris Darbyshire's weekly client commentary</li>
+                    <li>See how each story built, from a throwaway line in early July to impossible to ignore by August</li>
+                    <li>A short, honest look at what a full week of the Weekly Intelligence Brief covers</li>
+                </ul>
+            </div>
+            <div class="capture-card">
+                <div id="formPanel">
+                    <h3>Get the free PDF</h3>
+                    <p class="sub">Takes 10 seconds. We'll email you the occasional brief like this one, nothing else.</p>
+                    <form id="leadForm" name="state-of-markets-leads" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+                        <input type="hidden" name="form-name" value="state-of-markets-leads">
+                        <p class="hp-field" style="position:absolute;left:-9999px;">
+                            <label>Don't fill this out if you're human: <input name="bot-field" tabindex="-1" autocomplete="off"></label>
+                        </p>
+                        <div class="form-group">
+                            <label for="leadName">Name</label>
+                            <input type="text" id="leadName" name="name" required placeholder="Jane Smith">
+                        </div>
+                        <div class="form-group">
+                            <label for="leadEmail">Work email</label>
+                            <input type="email" id="leadEmail" name="email" required placeholder="jane@yourfirm.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="leadFirm">Firm (optional)</label>
+                            <input type="text" id="leadFirm" name="firm" placeholder="Your firm name">
+                        </div>
+                        <button type="submit" class="btn-download">Send Me the PDF</button>
+                        <p id="formError" class="form-error" style="display:none;color:#b3261e;font-size:0.82rem;margin-top:8px;">Something went wrong submitting your details, but here's the download &mdash; <a href="state-of-the-markets.pdf" download>get the PDF</a> and feel free to email us directly.</p>
+                    </form>
+                    <p class="capture-note">No spam. Unsubscribe anytime.</p>
+                </div>
+                <div id="successPanel" class="success-panel">
+                    <h3>You're in.</h3>
+                    <p>Your download is ready below. We've also noted your details so Chris can follow up if useful.</p>
+                    <a href="state-of-the-markets.pdf" class="download-btn" download>Download the PDF</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="preview-section">
+        <div class="preview-inner">
+            <h2>A preview of what's inside</h2>
+            <div class="preview-quote">
+                <p>"Iran's oil surplus desperately needs a global oil shortage."</p>
+                <div class="tag">7 July 2026</div>
+            </div>
+            <div class="preview-quote">
+                <p>"For years, the big tech companies have insisted their problem is a shortage of compute, not a surplus. Have compute resources been overbuilt, or could demand be slowing?"</p>
+                <div class="tag">7 July 2026</div>
+            </div>
+            <div class="preview-quote">
+                <p>"Investors have been here before, of course, and their extreme credulity was again in evidence."</p>
+                <div class="tag">4 August 2026</div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>Prefer the full picture every week? <a href="mailto:chris.darbyshire@cwd-consulting.com">Request a sample of the Weekly Intelligence Brief &rarr;</a></p>
+        </div>
+        <div class="footer-bottom">&copy; <span id="currentYear"></span> CWD Consulting. All rights reserved.</div>
+    </footer>
+
+    <script>
+        (function() {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 20); }, { passive: true });
+            const hamburger = document.getElementById('navHamburger');
+            const navLinks = document.getElementById('navLinks');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const closeMenu = () => { hamburger.classList.remove('active'); navLinks.classList.remove('open'); mobileOverlay.classList.remove('visible'); document.body.style.overflow=''; };
+            const openMenu = () => { hamburger.classList.add('active'); navLinks.classList.add('open'); mobileOverlay.classList.add('visible'); document.body.style.overflow='hidden'; };
+            hamburger.addEventListener('click', () => hamburger.classList.contains('active') ? closeMenu() : openMenu());
+            mobileOverlay.addEventListener('click', closeMenu);
+
+            // Lead capture: submits to Netlify Forms (built into this site's hosting, no
+            // separate backend needed). Submissions land in Site settings > Forms in Netlify,
+            // exportable to CSV, and can trigger an email notification per submission.
+            // If the POST ever fails (e.g. offline), the download still unlocks and the visitor
+            // sees a note to email directly, so no one is blocked from the PDF.
+            function encodeFormData(data) {
+                return Object.keys(data).map(function(k) {
+                    return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]);
+                }).join('&');
+            }
+            const form = document.getElementById('leadForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('leadName').value.trim();
+                const email = document.getElementById('leadEmail').value.trim();
+                const firm = document.getElementById('leadFirm').value.trim();
+
+                fetch('/', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: encodeFormData({ 'form-name': 'state-of-markets-leads', name: name, email: email, firm: firm, 'bot-field': '' })
+                })
+                .then(function() {
+                    document.getElementById('formPanel').style.display = 'none';
+                    document.getElementById('successPanel').style.display = 'block';
+                })
+                .catch(function() {
+                    document.getElementById('formError').style.display = 'block';
+                });
+            });
+        })();
+    </script>
+</body>
+</html>
