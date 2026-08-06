@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpaceX's $100bn Lock-Up: What the Numbers Actually Show | CWD Insights</title>
+    <meta name="description" content="Chris Darbyshire breaks down SpaceX's first insider lock-up expiry: 911.5 million shares, a 92% revenue beat, and why the stock fell anyway. CIO-level analysis from CWD Research Consulting.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-50: #f0fdfa; --teal-100: #ccfbf1; --teal-200: #99f6e4; --teal-300: #5eead4;
+            --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488; --teal-700: #0f766e;
+            --teal-800: #115e59; --teal-900: #134e4a; --teal-950: #042f2e;
+            --white: #ffffff; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563;
+            --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+            --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+            --transition: 0.2s ease; --transition-smooth: 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--white);color:var(--gray-800);line-height:1.6;font-size:16px;overflow-x:hidden;}
+
+        .nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid transparent;transition:all var(--transition-smooth);padding:0 24px;}
+        .nav.scrolled{border-bottom-color:var(--gray-200);box-shadow:var(--shadow-sm);}
+        .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px;}
+        .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:1.5rem;color:var(--teal-700);letter-spacing:-0.02em;}
+        .nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+        .nav-links a{text-decoration:none;color:var(--gray-600);font-weight:500;font-size:0.925rem;transition:color var(--transition);position:relative;padding:4px 0;}
+        .nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:var(--teal-500);border-radius:1px;transition:width var(--transition-smooth);}
+        .nav-links a:hover{color:var(--teal-700);}
+        .nav-links a:hover::after{width:100%;}
+        .nav-links a.nav-active{color:var(--teal-700);}
+        .nav-cta{background:var(--teal-700);color:var(--white)!important;padding:10px 20px!important;border-radius:var(--radius);font-weight:600!important;white-space:nowrap;}
+        .nav-cta:hover{background:var(--teal-800)!important;color:var(--white)!important;box-shadow:var(--shadow-md);}
+        .nav-cta::after{display:none!important;}
+        .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:8px;z-index:1001;}
+        .nav-hamburger span{display:block;width:26px;height:2.5px;background:var(--gray-700);border-radius:2px;transition:all var(--transition-smooth);}
+        .nav-hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+        .nav-hamburger.active span:nth-child(2){opacity:0;}
+        .nav-hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+        @media (max-width:768px){
+            .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:var(--white);flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:100px 32px 32px;gap:24px;box-shadow:var(--shadow-lg);transition:right var(--transition-smooth);}
+            .nav-links.open{right:0;}
+            .nav-hamburger{display:flex;}
+        }
+        .mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;opacity:0;pointer-events:none;transition:opacity var(--transition-smooth);}
+        .mobile-overlay.visible{opacity:1;pointer-events:auto;}
+
+        .article-hero{padding:150px 24px 60px;background:linear-gradient(170deg,#ffffff 0%,#f0fdfa 45%,#e6f7f5 100%);}
+        .article-hero-inner{max-width:760px;margin:0 auto;}
+        .article-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--teal-100);color:var(--teal-800);font-weight:600;font-size:0.8rem;padding:7px 16px;border-radius:var(--radius);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:20px;}
+        .article-hero h1{font-family:'Source Serif 4','Georgia',serif;font-size:clamp(2rem,4vw,2.9rem);font-weight:700;line-height:1.2;color:var(--gray-900);letter-spacing:-0.01em;margin-bottom:18px;}
+        .article-dek{font-size:1.15rem;color:var(--gray-600);line-height:1.6;margin-bottom:22px;}
+        .article-meta{display:flex;align-items:center;gap:10px;font-size:0.9rem;color:var(--gray-500);font-weight:500;}
+        .article-meta span.dot{width:4px;height:4px;border-radius:50%;background:var(--gray-400);}
+
+        .article-body{max-width:680px;margin:0 auto;padding:56px 24px 40px;}
+        .article-body h2{font-family:'Source Serif 4',serif;font-size:1.5rem;font-weight:700;color:var(--gray-900);margin:40px 0 16px;line-height:1.3;}
+        .article-body p{font-size:1.05rem;color:var(--gray-700);line-height:1.8;margin-bottom:20px;}
+        .article-body p strong{color:var(--gray-900);}
+        .pull-quote{font-family:'Source Serif 4',serif;font-size:1.3rem;font-weight:600;color:var(--teal-800);line-height:1.5;border-left:3px solid var(--teal-400);padding-left:22px;margin:32px 0;}
+        .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:32px 0;}
+        .stat-box{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px 16px;text-align:center;}
+        .stat-box .num{font-family:'Source Serif 4',serif;font-size:1.7rem;font-weight:700;color:var(--teal-700);line-height:1.1;}
+        .stat-box .lbl{font-size:0.78rem;color:var(--gray-500);font-weight:600;letter-spacing:0.02em;margin-top:6px;}
+
+        .article-cta{background:var(--teal-50);border:1px solid var(--teal-200);border-radius:var(--radius-lg);padding:28px 32px;margin-top:44px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+        .article-cta-text strong{display:block;font-size:1.05rem;color:var(--gray-900);margin-bottom:4px;}
+        .article-cta-text p{margin:0;font-size:0.92rem;color:var(--gray-600);}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:var(--radius);font-weight:600;font-size:0.92rem;text-decoration:none;border:none;transition:all var(--transition-smooth);font-family:'Inter',sans-serif;white-space:nowrap;}
+        .btn-primary{background:var(--teal-700);color:var(--white);box-shadow:var(--shadow-md);}
+        .btn-primary:hover{background:var(--teal-800);box-shadow:var(--shadow-lg);}
+
+        .back-link-row{max-width:680px;margin:0 auto;padding:0 24px 8px;}
+        .back-link{color:var(--teal-700);font-weight:600;font-size:0.9rem;text-decoration:none;}
+        .back-link:hover{text-decoration:underline;}
+
+        .footer{background:var(--teal-950);color:var(--gray-300);padding:64px 24px 28px;margin-top:60px;}
+        .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,0.08);}
+        .footer-brand{font-family:'Source Serif 4',serif;font-weight:700;font-size:1.3rem;color:var(--white);margin-bottom:12px;}
+        .footer-inner p{font-size:0.9rem;line-height:1.7;color:var(--gray-400);}
+        .footer h5{color:var(--white);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;}
+        .footer ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+        .footer a{color:var(--gray-400);text-decoration:none;font-size:0.9rem;}
+        .footer a:hover{color:var(--teal-300);}
+        .footer-bottom{max-width:1200px;margin:24px auto 0;font-size:0.8rem;color:var(--gray-500);text-align:center;}
+
+        @media (max-width:640px){
+            .stat-row{grid-template-columns:1fr;}
+            .footer-inner{grid-template-columns:1fr;}
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav" id="navbar">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo" aria-label="CWD Home">CWD Consulting</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="insights-archive.html" class="nav-active" aria-current="page">Archive</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#why-us">Why CWD</a></li>
+                <li><a href="podcast.html">Podcast</a></li>
+                <li><a href="mailto:chris.darbyshire@cwd-consulting.com" class="nav-cta">Contact the Team</a></li>
+            </ul>
+            <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <article>
+        <header class="article-hero">
+            <div class="article-hero-inner">
+                <span class="article-kicker">Insights Archive · Equity Markets</span>
+                <h1>SpaceX's $100bn Lock-Up: What the Numbers Actually Show</h1>
+                <p class="article-dek">A 92% revenue beat and a marquee Nvidia deal weren't enough to hold the price once 911.5 million insider shares hit the market. Here's why the two stories don't contradict each other.</p>
+                <div class="article-meta">
+                    <span>Chris Darbyshire</span>
+                    <span class="dot"></span>
+                    <span>CWD Research Consulting</span>
+                    <span class="dot"></span>
+                    <span>6 August 2026</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="back-link-row">
+            <a href="insights-archive.html" class="back-link">&larr; Back to the Insights Archive</a>
+        </div>
+
+        <div class="article-body">
+            <p>SpaceX told the market exactly what was coming, and then it came. That's the useful way to read this week's share price action, not as a surprise, but as a scheduled event that the fundamentals briefly obscured.</p>
+
+            <h2>The setup</h2>
+            <p>Short interest in SpaceX had already reached 219 million shares, a third of everything available to trade. That alone signalled a market bracing for volatility. Then, on Tuesday, the company reported its first quarterly results as a public entity: revenue up 92% year over year to $7.8bn, with the AI segment growing 247% to $2.6bn. A same-day announcement that SpaceX would use Nvidia chips exclusively for its AI infrastructure added fuel, and the shares jumped as much as 9% intraday.</p>
+
+            <h2>The numbers</h2>
+            <p>Two days later, on schedule, the first lock-up expired. 911.5 million insider shares, worth more than $100bn at recent prices, became eligible for trading. That nearly doubled the free float overnight, from roughly 640 million shares (about 5% of shares outstanding) to close to 12%.</p>
+
+            <div class="stat-row">
+                <div class="stat-box"><div class="num">911.5M</div><div class="lbl">SHARES UNLOCKED</div></div>
+                <div class="stat-box"><div class="num">$101BN+</div><div class="lbl">VALUE UNLOCKED</div></div>
+                <div class="stat-box"><div class="num">-14%</div><div class="lbl">SHARE PRICE MOVE</div></div>
+            </div>
+
+            <p>By mid-session the stock had given back the earnings pop and more, falling from Tuesday's $125.33 close to around $108, a drop of roughly 14%.</p>
+
+            <h2>Why the beat didn't matter</h2>
+            <p>This is the part worth sitting with. A 92% revenue beat and a headline partnership with the world's most sought-after chipmaker were not enough to hold the price against sheer share count. The business performed. The supply of tradeable stock simply overwhelmed it.</p>
+
+            <p class="pull-quote">Earnings tell you whether a business is working. Lock-ups tell you whether the market can absorb it. This week, those were two different questions with two very different answers, and the second one is the one that moved the price.</p>
+
+            <h2>The takeaway for portfolios</h2>
+            <p>The mistake would be reading this as a verdict on SpaceX's business, when it's really a lesson about market structure. Lock-up schedules are public information, disclosed at IPO and known well in advance. When a name is trading on a thin float with high short interest, the calendar matters as much as the fundamentals, sometimes more, for weeks at a time. SpaceX's staggered unlock structure means this isn't a one-off either: further tranches are scheduled through December, so investors should expect the pattern to repeat rather than assume Thursday's move was the whole story.</p>
+
+            <p>For anyone holding concentrated positions in recently listed companies with staggered lock-ups, the practical question isn't whether the business is sound. It's whether you know the calendar as well as you know the balance sheet.</p>
+
+            <div class="article-cta">
+                <div class="article-cta-text">
+                    <strong>This is one page of the weekly note I put together for clients.</strong>
+                    <p>Happy to send over a sample if it would be useful.</p>
+                </div>
+                <a href="mailto:chris.darbyshire@cwd-consulting.com" class="btn btn-primary">Request a Sample Brief</a>
+            </div>
+        </div>
+    </article>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">CWD Consulting</div>
+                <p>World-class investment research and strategic consulting for independent financial advisors and boutique investment management firms. In a flood of information, we deliver insight.</p>
+                <p style="margin-top:10px;"><a href="index.html" style="color:var(--teal-300);font-weight:600;">&larr; Back to CWD Consulting</a></p>
+            </div>
+            <div>
+                <h5>Services</h5>
+                <ul>
+                    <li><a href="index.html#services">Weekly Intelligence Brief</a></li>
+                    <li><a href="index.html#services">Full Services</a></li>
+                    <li><a href="index.html#services">Research</a></li>
+                    <li><a href="index.html#services">Asset Allocation</a></li>
+                    <li><a href="podcast.html">The CIO's Diary (Podcast)</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5>Contact</h5>
+                <ul>
+                    <li><a href="mailto:chris.darbyshire@cwd-consulting.com">Email Chris</a></li>
+                    <li><a href="index.html#why-us">About Chris Darbyshire</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; <span id="currentYear"></span> CWD Consulting. All rights reserved. | Designed for independent investment professionals.</div>
+    </footer>
+
+    <script>
+        (function() {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 20); }, { passive: true });
+            const hamburger = document.getElementById('navHamburger');
+            const navLinks = document.getElementById('navLinks');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const closeMenu = () => {
+                hamburger.classList.remove('active'); navLinks.classList.remove('open');
+                mobileOverlay.classList.remove('visible'); hamburger.setAttribute('aria-expanded','false');
+                document.body.style.overflow = '';
+            };
+            const openMenu = () => {
+                hamburger.classList.add('active'); navLinks.classList.add('open');
+                mobileOverlay.classList.add('visible'); hamburger.setAttribute('aria-expanded','true');
+                document.body.style.overflow = 'hidden';
+            };
+            hamburger.addEventListener('click', () => hamburger.classList.contains('active') ? closeMenu() : openMenu());
+            mobileOverlay.addEventListener('click', closeMenu);
+            navLinks.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMenu(); }); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && hamburger.classList.contains('active')) closeMenu(); });
+            window.addEventListener('resize', () => { if (window.innerWidth > 768 && hamburger.classList.contains('active')) closeMenu(); });
+        })();
+    </script>
+</body>
+</html>
