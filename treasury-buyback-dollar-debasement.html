@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insights Archive | CWD Research Consulting</title>
-    <meta name="description" content="A permanent archive of CIO-level market analysis from Chris Darbyshire at CWD Research Consulting: rates, equities, and the macro backdrop, one theme at a time.">
+    <title>The Treasury Spent $4bn. Gold Had Its Best Day in Six Months. | CWD Insights</title>
+    <meta name="description" content="Chris Darbyshire on the US Treasury's symbolic bond buyback, the 2007-high yields that preceded it, and the dollar-debasement trade it reignited in gold, Bitcoin and the dollar. CIO-level analysis from CWD Research Consulting.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
@@ -16,9 +16,10 @@
             --white: #ffffff; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
             --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563;
             --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
             --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
-            --radius: 8px; --radius-lg: 12px;
+            --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
             --transition: 0.2s ease; --transition-smooth: 0.3s cubic-bezier(0.4,0,0.2,1);
         }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -51,23 +52,36 @@
         .mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;opacity:0;pointer-events:none;transition:opacity var(--transition-smooth);}
         .mobile-overlay.visible{opacity:1;pointer-events:auto;}
 
-        .archive-hero{padding:150px 24px 60px;background:linear-gradient(170deg,#ffffff 0%,#f0fdfa 45%,#e6f7f5 100%);text-align:center;}
-        .archive-hero-inner{max-width:720px;margin:0 auto;}
-        .archive-eyebrow{display:inline-flex;align-items:center;gap:8px;background:var(--teal-100);color:var(--teal-800);font-weight:600;font-size:0.8rem;padding:7px 16px;border-radius:var(--radius);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:20px;}
-        .archive-hero h1{font-family:'Source Serif 4','Georgia',serif;font-size:clamp(2.2rem,4.5vw,3.1rem);font-weight:700;line-height:1.2;color:var(--gray-900);letter-spacing:-0.01em;margin-bottom:16px;}
-        .archive-hero p{font-size:1.1rem;color:var(--gray-600);line-height:1.65;}
+        .article-hero{padding:150px 24px 60px;background:linear-gradient(170deg,#ffffff 0%,#f0fdfa 45%,#e6f7f5 100%);}
+        .article-hero-inner{max-width:760px;margin:0 auto;}
+        .article-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--teal-100);color:var(--teal-800);font-weight:600;font-size:0.8rem;padding:7px 16px;border-radius:var(--radius);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:20px;}
+        .article-hero h1{font-family:'Source Serif 4','Georgia',serif;font-size:clamp(2rem,4vw,2.9rem);font-weight:700;line-height:1.2;color:var(--gray-900);letter-spacing:-0.01em;margin-bottom:18px;}
+        .article-dek{font-size:1.15rem;color:var(--gray-600);line-height:1.6;margin-bottom:22px;}
+        .article-meta{display:flex;align-items:center;gap:10px;font-size:0.9rem;color:var(--gray-500);font-weight:500;}
+        .article-meta span.dot{width:4px;height:4px;border-radius:50%;background:var(--gray-400);}
 
-        .archive-section{padding:64px 24px 100px;}
-        .archive-grid{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:20px;}
-        .archive-card{display:block;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:32px;text-decoration:none;transition:all var(--transition-smooth);}
-        .archive-card:hover{box-shadow:var(--shadow-lg);border-color:var(--teal-200);transform:translateY(-2px);}
-        .archive-card-topic{font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--teal-600);margin-bottom:10px;}
-        .archive-card-title{font-family:'Source Serif 4',serif;font-size:1.35rem;font-weight:700;color:var(--gray-900);line-height:1.35;margin-bottom:10px;}
-        .archive-card-excerpt{font-size:0.95rem;color:var(--gray-600);line-height:1.65;margin-bottom:16px;}
-        .archive-card-meta{font-size:0.85rem;color:var(--gray-500);font-weight:500;}
-        .archive-empty-note{max-width:920px;margin:36px auto 0;padding:20px 24px;background:var(--gray-50);border:1px dashed var(--gray-300);border-radius:var(--radius-lg);font-size:0.9rem;color:var(--gray-500);text-align:center;}
+        .article-body{max-width:680px;margin:0 auto;padding:56px 24px 40px;}
+        .article-body h2{font-family:'Source Serif 4',serif;font-size:1.5rem;font-weight:700;color:var(--gray-900);margin:40px 0 16px;line-height:1.3;}
+        .article-body p{font-size:1.05rem;color:var(--gray-700);line-height:1.8;margin-bottom:20px;}
+        .article-body p strong{color:var(--gray-900);}
+        .pull-quote{font-family:'Source Serif 4',serif;font-size:1.3rem;font-weight:600;color:var(--teal-800);line-height:1.5;border-left:3px solid var(--teal-400);padding-left:22px;margin:32px 0;}
+        .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:32px 0;}
+        .stat-box{background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px 16px;text-align:center;}
+        .stat-box .num{font-family:'Source Serif 4',serif;font-size:1.7rem;font-weight:700;color:var(--teal-700);line-height:1.1;}
+        .stat-box .lbl{font-size:0.78rem;color:var(--gray-500);font-weight:600;letter-spacing:0.02em;margin-top:6px;}
 
-        .footer{background:var(--teal-950);color:var(--gray-300);padding:64px 24px 28px;}
+        .article-cta{background:var(--teal-50);border:1px solid var(--teal-200);border-radius:var(--radius-lg);padding:28px 32px;margin-top:44px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+        .article-cta-text strong{display:block;font-size:1.05rem;color:var(--gray-900);margin-bottom:4px;}
+        .article-cta-text p{margin:0;font-size:0.92rem;color:var(--gray-600);}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:var(--radius);font-weight:600;font-size:0.92rem;text-decoration:none;border:none;transition:all var(--transition-smooth);font-family:'Inter',sans-serif;white-space:nowrap;}
+        .btn-primary{background:var(--teal-700);color:var(--white);box-shadow:var(--shadow-md);}
+        .btn-primary:hover{background:var(--teal-800);box-shadow:var(--shadow-lg);}
+
+        .back-link-row{max-width:680px;margin:0 auto;padding:0 24px 8px;}
+        .back-link{color:var(--teal-700);font-weight:600;font-size:0.9rem;text-decoration:none;}
+        .back-link:hover{text-decoration:underline;}
+
+        .footer{background:var(--teal-950);color:var(--gray-300);padding:64px 24px 28px;margin-top:60px;}
         .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,0.08);}
         .footer-brand{font-family:'Source Serif 4',serif;font-weight:700;font-size:1.3rem;color:var(--white);margin-bottom:12px;}
         .footer-inner p{font-size:0.9rem;line-height:1.7;color:var(--gray-400);}
@@ -77,7 +91,10 @@
         .footer a:hover{color:var(--teal-300);}
         .footer-bottom{max-width:1200px;margin:24px auto 0;font-size:0.8rem;color:var(--gray-500);text-align:center;}
 
-        @media (max-width:640px){ .footer-inner{grid-template-columns:1fr;} }
+        @media (max-width:640px){
+            .stat-row{grid-template-columns:1fr;}
+            .footer-inner{grid-template-columns:1fr;}
+        }
     </style>
 </head>
 <body>
@@ -100,52 +117,61 @@
     </nav>
     <div class="mobile-overlay" id="mobileOverlay"></div>
 
-    <header class="archive-hero">
-        <div class="archive-hero-inner">
-            <span class="archive-eyebrow">Insights Archive</span>
-            <h1>Every theme, kept on the record.</h1>
-            <p>This week's thinking lives on the <a href="insights.html" style="color:var(--teal-700);font-weight:600;">Insights</a> page. Everything that's held up past the week it was written lives here, permanently.</p>
-            <p style="margin-top:14px;"><a href="state-of-the-markets.html" style="color:var(--teal-700);font-weight:600;">Free download: four weeks of the Weekly Intelligence Brief, tracked in real time &rarr;</a></p>
-        </div>
-    </header>
+    <article>
+        <header class="article-hero">
+            <div class="article-hero-inner">
+                <span class="article-kicker">Insights Archive · Rates &amp; Safe Havens</span>
+                <h1>The Treasury Spent $4bn. Gold Had Its Best Day in Six Months.</h1>
+                <p class="article-dek">A bond buyback worth a rounding error against a $32 trillion market still knocked yields off a 2007 high, sent gold and Bitcoin sharply higher, and revived the "dollar-debasement" trade that's shadowed markets since early 2025. Here's why the size of the number mattered less than what investors chose to read into it.</p>
+                <div class="article-meta">
+                    <span>Chris Darbyshire</span>
+                    <span class="dot"></span>
+                    <span>CWD Research Consulting</span>
+                    <span class="dot"></span>
+                    <span>25 August 2026</span>
+                </div>
+            </div>
+        </header>
 
-    <section class="archive-section">
-        <div class="archive-grid">
-            <!-- ARCHIVE CARD TEMPLATE: copy this block for each new post, newest first -->
-            <a href="treasury-buyback-dollar-debasement.html" class="archive-card">
-                <div class="archive-card-topic">Rates &amp; Safe Havens</div>
-                <h2 class="archive-card-title">The Treasury Spent $4bn. Gold Had Its Best Day in Six Months.</h2>
-                <p class="archive-card-excerpt">A bond buyback worth a rounding error against the $32 trillion Treasury market still knocked yields off a 2007 high, sent gold and Bitcoin sharply higher, and reignited the dollar-debasement trade that's shadowed markets since early 2025.</p>
-                <div class="archive-card-meta">25 August 2026 &middot; Chris Darbyshire</div>
-            </a>
-            <a href="nvidia-ai-financing-analysis.html" class="archive-card">
-                <div class="archive-card-topic">AI &amp; Credit Markets</div>
-                <h2 class="archive-card-title">Nvidia Is Now Financing the Company That Buys Its Chips</h2>
-                <p class="archive-card-excerpt">A $105bn credit line for OpenAI's Ohio campus, a guarantee on up to 25% of any AI project's residual value, and a regulatory carve-out that keeps the loans outside the usual investor protections.</p>
-                <div class="archive-card-meta">18 August 2026 &middot; Chris Darbyshire</div>
-            </a>
-            <a href="jobs-leverage-ai-financing-gap.html" class="archive-card">
-                <div class="archive-card-topic">Macro &amp; Market Structure</div>
-                <h2 class="archive-card-title">Jobs, Leverage and the AI Financing Gap</h2>
-                <p class="archive-card-excerpt">US payrolls have stalled since May, yet risk assets just posted their most euphoric week in years, built more on leverage and debt-financed AI spending than on the economy underneath it.</p>
-                <div class="archive-card-meta">11 August 2026 &middot; Chris Darbyshire</div>
-            </a>
-            <a href="china-tech-valuation-gap-baidu-waymo.html" class="archive-card">
-                <div class="archive-card-topic">China Tech &middot; Valuation</div>
-                <h2 class="archive-card-title">Baidu Is Worth $38bn. Waymo Alone Is Worth $126bn.</h2>
-                <p class="archive-card-excerpt">Baidu runs a search engine, a leading LLM, a cloud business and a robotaxi fleet running about as many monthly rides as Waymo. The whole company is priced at less than a third of Waymo on its own.</p>
-                <div class="archive-card-meta">6 August 2026 &middot; Chris Darbyshire</div>
-            </a>
-            <a href="spacex-share-lockup-analysis.html" class="archive-card">
-                <div class="archive-card-topic">Equity Markets</div>
-                <h2 class="archive-card-title">SpaceX's $100bn Lock-Up: What the Numbers Actually Show</h2>
-                <p class="archive-card-excerpt">A 92% revenue beat and a marquee Nvidia deal weren't enough to hold the price once 911.5 million insider shares hit the market. Here's why the two stories don't contradict each other.</p>
-                <div class="archive-card-meta">6 August 2026 &middot; Chris Darbyshire</div>
-            </a>
-            <!-- END TEMPLATE -->
+        <div class="back-link-row">
+            <a href="insights-archive.html" class="back-link">&larr; Back to the Insights Archive</a>
         </div>
-        <div class="archive-empty-note">New pieces are added here as this week's themes prove out. Check back, or subscribe to the Weekly Intelligence Brief to get them first.</div>
-    </section>
+
+        <div class="article-body">
+            <p>A bad start to the week for government bond markets was interrupted by the US Treasury, and the way markets reacted to a genuinely small policy move turned out to be the more interesting story.</p>
+
+            <h2>The trigger</h2>
+            <p>US 30-year Treasury yields hit 5.34% on Tuesday, their highest since 2007. American 30-year mortgage rates had recently surged to 7%, slowing house-price appreciation and turning bond markets into front-page news. Into that backdrop, the Treasury Department said it would spend more buying back long-dated securities, doubling the size of its buyback operations to at least $4bn each, funded by shorter-term bond issuance.</p>
+
+            <h2>The scale problem</h2>
+            <p>The Treasury's action is, by its own numbers, largely symbolic. $4bn is a pittance against a $32.2 trillion US Treasury bond market: about one-hundredth of one percent. Markets reacted anyway. US long-dated yields fell nearly 10bp, back to where they'd been six days earlier, dragging European government bond yields down with them and lifting equities roughly 0.5% on the hint of a government backstop.</p>
+
+            <div class="stat-row">
+                <div class="stat-box"><div class="num">$4BN</div><div class="lbl">DOUBLED BUYBACK SIZE, PER OPERATION</div></div>
+                <div class="stat-box"><div class="num">$32.2TRN</div><div class="lbl">TOTAL US TREASURY MARKET</div></div>
+                <div class="stat-box"><div class="num">5.34%</div><div class="lbl">30-YR YIELD PEAK, HIGHEST SINCE 2007</div></div>
+            </div>
+
+            <h2>What actually moved</h2>
+            <p>The bigger reaction happened away from bonds entirely. The dollar fell 0.8% on a trade-weighted basis to its lowest in three months. Gold rose 4%, its best day in six months. Bitcoin rose 6%, with roughly $1bn of short positions liquidated within the hour, and crypto ETFs recorded their largest net inflows since October. Tellingly, 30-year Treasuries gave back most of their gains within days, while gold and Bitcoin held onto theirs. Treasury Secretary Bessent later told interviewers the expanded buybacks "could be more than the $4bn" size, adding: "The yields don't reflect the underlying fundamentals... All we're trying to do is get people to focus on the fundamentals and not trade the headlines during a quiet period in a thin market."</p>
+
+            <p class="pull-quote">Investors now know that President Trump thinks bond yields are a problem.</p>
+
+            <h2>A playbook markets already know</h2>
+            <p>The "dollar-debasement" trade, a catch-all for positioning against policies seen as devaluing US assets, whether the dollar, government bonds or stocks, first took shape in early 2025 following President Trump's inauguration. It is no longer a novel idea; it is a known playbook, which is precisely why gold and Bitcoin could rally so fast on so small a policy signal. Investors did not need convincing that the move meant something. They already had the template for what to do with it.</p>
+
+            <h2>The takeaway for portfolios</h2>
+            <p>When the size of a policy action doesn't match the size of the market it's aimed at, the announcement itself isn't the signal to watch, where the money actually flows next is. This week, that was gold, Bitcoin and the dollar, not the bonds the Treasury was nominally defending. We would rather track that gap than assume a symbolic move and a real one look the same from the outside.</p>
+
+            <div class="article-cta">
+                <div class="article-cta-text">
+                    <strong>This is one page of the weekly note I put together for clients.</strong>
+                    <p>Happy to send over a sample if it would be useful.</p>
+                </div>
+                <a href="mailto:chris.darbyshire@cwd-consulting.com" class="btn btn-primary">Request a Sample Brief</a>
+            </div>
+        </div>
+    </article>
 
     <footer class="footer">
         <div class="footer-inner">
