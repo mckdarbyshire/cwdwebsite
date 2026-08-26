@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Use | CWD Research Consulting</title>
+    <meta name="description" content="Terms governing use of the CWD Consulting website.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-50: #f0fdfa; --teal-100: #ccfbf1; --teal-200: #99f6e4; --teal-300: #5eead4;
+            --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488; --teal-700: #0f766e;
+            --teal-800: #115e59; --teal-900: #134e4a; --teal-950: #042f2e;
+            --white: #ffffff; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563;
+            --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+            --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+            --transition: 0.2s ease; --transition-smooth: 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--white);color:var(--gray-800);line-height:1.6;font-size:16px;overflow-x:hidden;}
+
+        .nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--gray-200);padding:0 24px;}
+        .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px;}
+        .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:1.5rem;color:var(--teal-700);letter-spacing:-0.02em;}
+        .nav-links{display:flex;align-items:center;gap:28px;list-style:none;}
+        .nav-links a{text-decoration:none;color:var(--gray-600);font-weight:500;font-size:0.925rem;}
+        .nav-links a:hover{color:var(--teal-700);}
+        .nav-cta{background:var(--teal-700);color:var(--white)!important;padding:10px 20px!important;border-radius:var(--radius);font-weight:600!important;white-space:nowrap;}
+        .nav-cta:hover{background:var(--teal-800)!important;}
+        @media (max-width:768px){ .nav-links{display:none;} }
+
+        .legal-hero{padding:150px 24px 40px;background:linear-gradient(170deg,#ffffff 0%,#f0fdfa 45%,#e6f7f5 100%);}
+        .legal-hero-inner{max-width:760px;margin:0 auto;}
+        .legal-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--teal-100);color:var(--teal-800);font-weight:600;font-size:0.8rem;padding:7px 16px;border-radius:var(--radius);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:20px;}
+        .legal-hero h1{font-family:'Source Serif 4','Georgia',serif;font-size:clamp(1.9rem,4vw,2.6rem);font-weight:700;line-height:1.2;color:var(--gray-900);letter-spacing:-0.01em;margin-bottom:14px;}
+        .legal-updated{font-size:0.9rem;color:var(--gray-500);font-weight:500;}
+
+        .legal-body{max-width:760px;margin:0 auto;padding:48px 24px 40px;}
+        .legal-body h2{font-family:'Source Serif 4',serif;font-size:1.3rem;font-weight:700;color:var(--gray-900);margin:36px 0 14px;line-height:1.3;}
+        .legal-body h2:first-child{margin-top:0;}
+        .legal-body p{font-size:1rem;color:var(--gray-700);line-height:1.75;margin-bottom:16px;}
+        .legal-body ul{margin:0 0 16px 20px;color:var(--gray-700);}
+        .legal-body li{font-size:1rem;line-height:1.75;margin-bottom:8px;}
+        .legal-body a{color:var(--teal-700);font-weight:600;text-decoration:none;}
+        .legal-body a:hover{text-decoration:underline;}
+        .legal-note{background:var(--teal-50);border:1px solid var(--teal-200);border-radius:var(--radius-lg);padding:20px 24px;margin:36px 0;font-size:0.92rem;color:var(--teal-800);}
+
+        .footer{background:var(--teal-950);color:var(--gray-300);padding:56px 24px 28px;margin-top:40px;}
+        .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-bottom:32px;border-bottom:1px solid rgba(255,255,255,0.08);}
+        .footer-brand{font-family:'Source Serif 4',serif;font-weight:700;font-size:1.3rem;color:var(--white);margin-bottom:12px;}
+        .footer-inner p{font-size:0.9rem;line-height:1.7;color:var(--gray-400);}
+        .footer h5{color:var(--white);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;}
+        .footer ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+        .footer a{color:var(--gray-400);text-decoration:none;font-size:0.9rem;}
+        .footer a:hover{color:var(--teal-300);}
+        .footer-bottom{max-width:1200px;margin:24px auto 0;font-size:0.8rem;color:var(--gray-500);text-align:center;}
+        @media (max-width:640px){ .footer-inner{grid-template-columns:1fr;} }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo">CWD Consulting</a>
+            <ul class="nav-links">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="podcast.html">Podcast</a></li>
+                <li><a href="mailto:chris@cwdresearchconsulting.com" class="nav-cta">Contact the Team</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="legal-hero">
+        <div class="legal-hero-inner">
+            <span class="legal-kicker">Legal</span>
+            <h1>Terms of Use</h1>
+            <p class="legal-updated">Last updated 26 August 2026</p>
+        </div>
+    </header>
+
+    <div class="legal-body">
+        <p>These terms govern your use of cwdresearchconsulting.com, operated by CWD Consulting ("CWD", "we", "us"). By using this site, you agree to them. If you don't agree, please don't use the site.</p>
+
+        <h2>Who this site is for</h2>
+        <p>This site and the research, commentary and services described on it are intended for independent financial advisors, boutique investment management firms, and other investment professionals. It is not intended for retail consumers seeking personal financial advice.</p>
+
+        <h2>Not investment advice</h2>
+        <p>Everything on this site, including the Weekly Intelligence Brief, the Insights section, and The CIO's Diary, is provided for general informational purposes only. It reflects the views of CWD and Chris Darbyshire at the time it was written or recorded, and it is not, and should not be treated as, a personal recommendation or regulated investment advice. Markets move; past commentary and analysis are not a guide to future performance. You remain responsible for your own investment decisions and for taking independent advice where appropriate.</p>
+
+        <h2>Intellectual property</h2>
+        <p>The content on this site, including text, research commentary, graphics, audio and video, is owned by CWD or used with permission, and is protected by copyright. You're welcome to share links to our content. Please don't reproduce, redistribute, or republish it elsewhere without asking us first.</p>
+
+        <h2>Accuracy of information</h2>
+        <p>We take care to make sure the information on this site is accurate at the time of publication, drawing on sources we consider reliable. We don't guarantee that it's complete, current, or error-free, and we don't accept liability for decisions made in reliance on it.</p>
+
+        <h2>Third-party links and embeds</h2>
+        <p>This site links to and embeds content from third parties, including YouTube. We don't control and aren't responsible for the content, availability, or practices of those third-party sites.</p>
+
+        <h2>Limitation of liability</h2>
+        <p>To the extent permitted by law, CWD isn't liable for any loss or damage arising from your use of this site, including any reliance on its content. Nothing in these terms limits liability that can't legally be limited, such as for fraud.</p>
+
+        <h2>Changes</h2>
+        <p>We may update this site and these terms from time to time. The date at the top of this page shows when it was last revised. Continuing to use the site after a change means you accept the updated terms.</p>
+
+        <h2>Governing law</h2>
+        <p>These terms are governed by the laws of England and Wales.</p>
+
+        <h2>Contact</h2>
+        <p>Questions about these terms can go to <a href="mailto:chris@cwdresearchconsulting.com">chris@cwdresearchconsulting.com</a>.</p>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">CWD Consulting</div>
+                <p>World-class investment research and strategic consulting for independent financial advisors and boutique investment management firms. In a flood of information, we deliver insight.</p>
+                <p style="margin-top:10px;"><a href="index.html" style="color:var(--teal-300);font-weight:600;">&larr; Back to CWD Consulting</a></p>
+            </div>
+            <div>
+                <h5>Services</h5>
+                <ul>
+                    <li><a href="index.html#services">Weekly Intelligence Brief</a></li>
+                    <li><a href="index.html#services">Full Services</a></li>
+                    <li><a href="podcast.html">The CIO's Diary (Podcast)</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5>Contact</h5>
+                <ul>
+                    <li><a href="mailto:chris@cwdresearchconsulting.com">Email Chris</a></li>
+                    <li><a href="index.html#why-us">About Chris Darbyshire</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; <span id="currentYear"></span> CWD Consulting. All rights reserved. | Designed for independent investment professionals. | <a href="privacy-policy.html" style="color:var(--gray-400);text-decoration:underline;">Privacy Policy</a> &middot; <a href="terms-of-use.html" style="color:var(--gray-400);text-decoration:underline;">Terms of Use</a></div>
+    </footer>
+
+    <script>document.getElementById('currentYear').textContent = new Date().getFullYear();</script>
+</body>
+</html>
