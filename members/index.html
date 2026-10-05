@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Client Webinars | CWD Research Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/members/portal.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html"><span class="brand-name">CWD Consulting</span><span class="brand-tag">Client Webinars</span></a>
+    <div class="topbar-right" id="userBar" hidden>
+      <div class="whoami"><strong id="whoName"></strong><span id="whoFirm"></span></div>
+      <button class="btn btn-ghost btn-sm" id="signOut" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<div class="loading" id="loading">Loading&hellip;</div>
+
+<!-- Sign in -->
+<div class="auth-wrap" id="signIn" hidden>
+  <div class="auth-card">
+    <span class="kicker">Subscribers</span>
+    <h1>Sign in to the Weekly Markets Webinar</h1>
+    <p class="lead">Chris Darbyshire's weekly webinar and the full archive, for subscribing firms.</p>
+    <div class="alert alert-error" id="signInError" hidden></div>
+    <form id="signInForm" novalidate>
+      <div class="field"><label for="email">Work email</label><input type="email" id="email" autocomplete="username" required></div>
+      <div class="field"><label for="password">Password</label><input type="password" id="password" autocomplete="current-password" required></div>
+      <button class="btn btn-primary" type="submit" id="signInBtn">Sign in</button>
+    </form>
+    <div class="auth-foot">
+      Forgotten your password? Email <a href="mailto:chris@cwdresearchconsulting.com?subject=Webinar%20access">chris@cwdresearchconsulting.com</a> and we will send you a new access link.<br><br>
+      Not a subscriber yet? <a href="/webinar.html">See how the webinar works</a>.
+    </div>
+  </div>
+</div>
+
+<!-- Library -->
+<main class="main" id="library" hidden>
+  <div id="emptyState" class="empty" hidden>
+    <h2 class="serif" style="font-size:1.3rem;color:var(--gray-900);margin-bottom:6px;">Your library is ready</h2>
+    <p>The next webinar will appear here as soon as it is published.</p>
+  </div>
+
+  <section class="feature" id="feature" hidden>
+    <div>
+      <div class="player" id="player">
+        <button class="poster" id="poster" type="button" aria-label="Play webinar">
+          <span class="poster-sub" id="posterSub">This week</span>
+          <span class="play"><svg width="28" height="28" viewBox="0 0 24 24" fill="#fff" aria-hidden="true"><polygon points="8,5 19,12 8,19"/></svg></span>
+          <span class="poster-title" id="posterTitle"></span>
+        </button>
+      </div>
+      <p class="player-note">For your firm's internal use only. Please do not record, share or redistribute.</p>
+    </div>
+    <div>
+      <span class="kicker" id="featKicker">This week</span>
+      <h1 id="featTitle"></h1>
+      <div class="meta" id="featMeta"></div>
+      <p class="summary" id="featSummary"></p>
+      <ul class="topics" id="featTopics"></ul>
+    </div>
+  </section>
+
+  <div id="archiveWrap" hidden>
+    <div class="section-head">
+      <h2>Archive</h2>
+      <input type="search" id="search" placeholder="Search by title or topic" aria-label="Search the archive">
+    </div>
+    <div class="archive" id="archive"></div>
+    <div class="empty" id="noResults" hidden>No webinars match that search.</div>
+  </div>
+</main>
+
+<footer class="footer-mini">&copy; <span id="yr"></span> CWD Research Consulting &middot; Content is general market commentary for professional investors and is not personal advice &middot; <a href="/webinar-terms.html">Terms of access</a></footer>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  document.getElementById('yr').textContent = new Date().getFullYear();
+  let me = null, items = [], current = null;
+
+  async function api(path, opts = {}) {
+    const res = await fetch(path, { credentials: 'same-origin', ...opts,
+      headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { const e = new Error(data.error || 'Request failed'); e.status = res.status; throw e; }
+    return data;
+  }
+
+  const fmtDate = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const fmtShort = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  const fmtMonth = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  const fmtLen = (s) => s ? `${Math.round(s / 60)} min` : '';
+  function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+  function show(view) {
+    $('loading').hidden = view !== 'loading';
+    $('signIn').hidden = view !== 'signIn';
+    $('library').hidden = view !== 'library';
+    $('userBar').hidden = view !== 'library';
+  }
+
+  async function boot() {
+    try {
+      const data = await api('/api/members/webinars');
+      me = data.user; items = data.webinars;
+      $('whoName').textContent = me.name; $('whoFirm').textContent = me.firm;
+      render(); show('library');
+    } catch (e) {
+      if (e.status === 401) { show('signIn'); $('email').focus(); }
+      else { show('signIn'); showErr(e.message); }
+    }
+  }
+
+  function showErr(msg) { const a = $('signInError'); a.textContent = msg; a.hidden = !msg; }
+
+  $('signInForm').addEventListener('submit', async (ev) => {
+    ev.preventDefault(); showErr('');
+    const btn = $('signInBtn'); btn.disabled = true; btn.textContent = 'Signing in…';
+    try {
+      await api('/api/auth/login', { method: 'POST', body: JSON.stringify({ email: $('email').value, password: $('password').value }) });
+      $('password').value = ''; show('loading'); await boot();
+    } catch (e) { showErr(e.message); }
+    finally { btn.disabled = false; btn.textContent = 'Sign in'; }
+  });
+
+  $('signOut').addEventListener('click', async () => {
+    await api('/api/auth/logout', { method: 'POST', body: '{}' }).catch(() => {});
+    location.reload();
+  });
+
+  function setFeature(w, isLatest) {
+    current = w;
+    $('featKicker').textContent = isLatest ? 'This week' : 'From the archive';
+    $('posterSub').textContent = 'Week of ' + fmtDate(w.weekOf);
+    $('posterTitle').textContent = w.title;
+    $('featTitle').textContent = w.title;
+    $('featMeta').textContent = ['Week of ' + fmtDate(w.weekOf), 'Chris Darbyshire', fmtLen(w.lengthSec)].filter(Boolean).join('  ·  ');
+    $('featSummary').textContent = w.summary || '';
+    $('featSummary').hidden = !w.summary;
+    const ul = $('featTopics'); ul.replaceChildren(...(w.topics || []).map((t) => el('li', '', t)));
+    // reset the player to the poster for the newly selected webinar
+    const player = $('player'); player.querySelectorAll('iframe,.watermark').forEach((n) => n.remove());
+    $('poster').hidden = false;
+    document.querySelectorAll('.row').forEach((r) => r.classList.toggle('current', r.dataset.id === w.id));
+  }
+
+  function watermark() {
+    const wm = el('div', 'watermark');
+    const label = `${me.email}  ·  ${me.firm}`;
+    const spots = [[6, 16], [50, 30], [12, 54], [54, 70], [24, 86]];
+    spots.forEach(([x, y]) => { const s = el('span', '', label); s.style.left = x + '%'; s.style.top = y + '%'; wm.appendChild(s); });
+    return wm;
+  }
+
+  $('poster').addEventListener('click', async () => {
+    if (!current) return;
+    const poster = $('poster'); poster.disabled = true;
+    try {
+      const data = await api('/api/members/play?id=' + encodeURIComponent(current.id));
+      const f = document.createElement('iframe');
+      f.src = data.embedUrl.replace('autoplay=false', 'autoplay=true');
+      f.title = current.title;
+      f.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; fullscreen';
+      f.setAttribute('allowfullscreen', '');
+      poster.hidden = true;
+      $('player').append(f, watermark());
+      current.watched = true; renderArchive();
+    } catch (e) {
+      if (e.status === 401) { show('signIn'); showErr('Your session has ended. Please sign in again.'); }
+      else { $('posterSub').textContent = e.message; }
+    } finally { poster.disabled = false; }
+  });
+
+  function render() {
+    $('emptyState').hidden = items.length > 0;
+    $('feature').hidden = items.length === 0;
+    $('archiveWrap').hidden = items.length < 2;
+    if (items.length) setFeature(items[0], true);
+    renderArchive();
+  }
+
+  function renderArchive() {
+    const q = $('search').value.trim().toLowerCase();
+    const list = items.filter((w) => !q || [w.title, w.summary, ...(w.topics || [])].join(' ').toLowerCase().includes(q));
+    const box = $('archive'); box.replaceChildren();
+    let month = '';
+    for (const w of list) {
+      const m = fmtMonth(w.weekOf);
+      if (m !== month) { month = m; box.appendChild(el('div', 'archive-month', m)); }
+      const row = el('button', 'row' + (current && current.id === w.id ? ' current' : ''));
+      row.type = 'button'; row.dataset.id = w.id;
+      row.appendChild(el('div', 'row-date', fmtShort(w.weekOf)));
+      const mid = el('div'); mid.appendChild(el('div', 'row-title', w.title));
+      if (w.summary) mid.appendChild(el('div', 'row-sum', w.summary));
+      row.appendChild(mid);
+      const side = el('div', 'row-side');
+      if (w.lengthSec) side.appendChild(el('span', '', fmtLen(w.lengthSec)));
+      if (w === items[0]) side.appendChild(el('span', 'badge badge-teal', 'Latest'));
+      if (w.watched) side.appendChild(el('span', 'badge badge-gray', 'Watched'));
+      row.appendChild(side);
+      row.addEventListener('click', () => { setFeature(w, w === items[0]); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+      box.appendChild(row);
+    }
+    $('noResults').hidden = list.length > 0 || items.length < 2;
+  }
+  $('search').addEventListener('input', renderArchive);
+
+  boot();
+})();
+</script>
+</body>
+</html>

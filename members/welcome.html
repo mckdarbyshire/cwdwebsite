@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Set Up Your Access | CWD Research Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/members/portal.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html"><span class="brand-name">CWD Consulting</span><span class="brand-tag">Client Webinars</span></a>
+  </div>
+</header>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div id="checking" style="color:var(--gray-500)">Checking your access link&hellip;</div>
+
+    <div id="invalid" hidden>
+      <span class="kicker">Access link</span>
+      <h1>This link is no longer valid</h1>
+      <p class="lead" id="invalidMsg">Access links expire after seven days and can only be used once.</p>
+      <p style="font-size:.9rem;color:var(--gray-600)">Please email <a href="mailto:chris@cwdresearchconsulting.com?subject=New%20webinar%20access%20link">chris@cwdresearchconsulting.com</a> for a new one, or <a href="/members/">sign in</a> if you have already set your password.</p>
+    </div>
+
+    <div id="setup" hidden>
+      <span class="kicker">Welcome</span>
+      <h1 id="hello">Set up your access</h1>
+      <p class="lead">Choose a password for <strong id="emailOut"></strong>. You will use it with your email address to sign in to the webinar library.</p>
+      <div class="alert alert-error" id="err" hidden></div>
+      <form id="form" novalidate>
+        <input type="email" id="username" autocomplete="username" hidden>
+        <div class="field">
+          <label for="pw">New password</label>
+          <input type="password" id="pw" autocomplete="new-password" minlength="10" required>
+          <div class="hint">At least 10 characters. A short phrase works well.</div>
+        </div>
+        <div class="field"><label for="pw2">Confirm password</label><input type="password" id="pw2" autocomplete="new-password" required></div>
+        <div class="field">
+          <label class="check"><input type="checkbox" id="terms"> <span>I have read and accept the <a href="/webinar-terms.html" target="_blank" rel="noopener">terms of access</a>, including that the webinars are for my firm's internal use and must not be recorded or shared.</span></label>
+        </div>
+        <button class="btn btn-primary" type="submit" id="btn">Set password and continue</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<footer class="footer-mini">&copy; <span id="yr"></span> CWD Research Consulting</footer>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  $('yr').textContent = new Date().getFullYear();
+  const token = location.hash.slice(1);
+  // Remove the token from the address bar and history straight away.
+  history.replaceState(null, '', location.pathname);
+
+  async function post(body) {
+    const res = await fetch('/api/auth/invite', { method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, ...body }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) { const e = new Error(data.error || 'Request failed'); e.status = res.status; throw e; }
+    return data;
+  }
+
+  function invalid(msg) { $('checking').hidden = true; $('invalid').hidden = false; if (msg) $('invalidMsg').textContent = msg; }
+
+  async function start() {
+    if (!token) return invalid();
+    try {
+      const { user } = await post({ check: true });
+      $('checking').hidden = true; $('setup').hidden = false;
+      $('hello').textContent = 'Welcome, ' + user.name.split(' ')[0];
+      $('emailOut').textContent = user.email; $('username').value = user.email;
+      $('pw').focus();
+    } catch (e) { invalid(e.status === 410 ? null : e.message); }
+  }
+
+  $('form').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const err = $('err'); err.hidden = true;
+    const fail = (m) => { err.textContent = m; err.hidden = false; };
+    if ($('pw').value.length < 10) return fail('Please choose a password of at least 10 characters.');
+    if ($('pw').value !== $('pw2').value) return fail('The two passwords do not match.');
+    if (!$('terms').checked) return fail('Please confirm you accept the terms of access.');
+    const btn = $('btn'); btn.disabled = true; btn.textContent = 'Saving…';
+    try {
+      await post({ password: $('pw').value, acceptTerms: true });
+      location.replace('/members/');
+    } catch (e) {
+      if (e.status === 410) invalid(); else fail(e.message);
+      btn.disabled = false; btn.textContent = 'Set password and continue';
+    }
+  });
+
+  start();
+})();
+</script>
+</body>
+</html>

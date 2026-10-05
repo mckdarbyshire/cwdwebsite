@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Webinar Console | CWD Research Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/members/portal.css">
+<script src="/members/vendor/tus.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html"><span class="brand-name">CWD Consulting</span><span class="brand-tag">Webinar Console</span></a>
+    <div class="topbar-right" id="adminBar" hidden>
+      <a class="btn btn-ghost btn-sm" href="/members/" target="_blank" rel="noopener">Client view</a>
+      <button class="btn btn-ghost btn-sm" id="signOut" type="button">Sign out</button>
+    </div>
+  </div>
+</header>
+
+<div class="loading" id="loading">Loading&hellip;</div>
+
+<div class="auth-wrap" id="login" hidden>
+  <div class="auth-card">
+    <span class="kicker">CWD staff</span>
+    <h1>Webinar console</h1>
+    <p class="lead">Upload recordings and manage subscriber access.</p>
+    <div class="alert alert-error" id="loginErr" hidden></div>
+    <form id="loginForm">
+      <input type="text" autocomplete="username" value="cwd-admin" hidden>
+      <div class="field"><label for="adminPw">Admin password</label><input type="password" id="adminPw" autocomplete="current-password" required></div>
+      <button class="btn btn-primary" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<main class="main" id="console" hidden>
+  <div class="alert alert-warn" id="setupWarn" hidden></div>
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="webinars" type="button">Webinars</button>
+    <button class="tab" data-tab="clients" type="button">Clients</button>
+    <button class="tab" data-tab="setup" type="button">Setup</button>
+  </nav>
+
+  <!-- WEBINARS -->
+  <section data-panel="webinars">
+    <div class="card">
+      <h2>Upload this week's webinar</h2>
+      <p class="sub">Choose the OBS recording (MP4 recommended). It goes straight to secure video storage and appears in the client library once processing finishes, usually within a few minutes of the upload completing.</p>
+      <div class="alert alert-error" id="upErr" hidden></div>
+      <div class="alert alert-ok" id="upOk" hidden></div>
+      <form id="upForm">
+        <div class="grid-2">
+          <div class="field"><label for="upTitle">Title</label><input type="text" id="upTitle" required maxlength="200" placeholder="e.g. Gilts Wobble, Gold Holds, Earnings Season Begins"></div>
+          <div class="field"><label for="upWeek">Week of</label><input type="date" id="upWeek" required></div>
+        </div>
+        <div class="field"><label for="upSummary">Summary <span class="hint" style="display:inline">(shown to clients)</span></label><textarea id="upSummary" maxlength="3000" placeholder="Two or three sentences on what this week's webinar covers."></textarea></div>
+        <div class="field"><label for="upTopics">Key topics <span class="hint" style="display:inline">(one per line, up to 8)</span></label><textarea id="upTopics" placeholder="US payrolls and the Fed path&#10;Hormuz and the oil risk premium&#10;Positioning: where we are adding duration"></textarea></div>
+        <div class="field"><label for="upFile">Recording</label><input type="file" id="upFile" accept="video/*,.mp4,.mkv,.mov" required></div>
+        <div class="field"><label class="check"><input type="checkbox" id="upPublish" checked> <span>Publish to clients automatically when ready</span></label></div>
+        <div id="upProgressWrap" hidden>
+          <div class="progress"><div id="upBar"></div></div>
+          <div class="hint" id="upStatus"></div>
+        </div>
+        <div class="actions" style="margin-top:8px">
+          <button class="btn btn-primary" type="submit" id="upBtn">Upload webinar</button>
+          <button class="btn btn-ghost" type="button" id="upCancel" hidden>Pause upload</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div><h2>Library</h2><p class="sub">Newest first. Clients see published webinars only; the newest becomes "This week".</p></div>
+        <button class="btn btn-ghost btn-sm" id="refreshW" type="button">Refresh</button>
+      </div>
+      <div class="alert alert-warn" id="bunnyErr" hidden></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Week of</th><th>Title</th><th>Video</th><th>Clients see it?</th><th>Actions</th></tr></thead>
+        <tbody id="wBody"></tbody>
+      </table></div>
+      <div id="unlinkedWrap" hidden style="margin-top:24px">
+        <h3 style="font-size:1rem;margin-bottom:4px">Videos in storage not yet in the library</h3>
+        <p class="sub" style="margin-bottom:12px">For recordings uploaded directly in the Bunny dashboard. Add one to give it a title, date and summary.</p>
+        <div class="table-wrap"><table><thead><tr><th>Uploaded</th><th>Name in storage</th><th>Status</th><th></th></tr></thead><tbody id="uBody"></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLIENTS -->
+  <section data-panel="clients" hidden>
+    <div class="card">
+      <h2>Add a subscriber</h2>
+      <p class="sub">Add each person at a subscribing firm. You will get a private access link (valid for 7 days, single use) to send them from your own email once the invoice is agreed.</p>
+      <div class="alert alert-error" id="cErr" hidden></div>
+      <form id="cForm">
+        <div class="grid-3">
+          <div class="field"><label for="cName">Full name</label><input type="text" id="cName" required maxlength="120"></div>
+          <div class="field"><label for="cFirm">Firm</label><input type="text" id="cFirm" required maxlength="120" list="firmList"><datalist id="firmList"></datalist></div>
+          <div class="field"><label for="cEmail">Work email</label><input type="email" id="cEmail" required maxlength="254"></div>
+        </div>
+        <button class="btn btn-primary" type="submit">Add subscriber and create access link</button>
+      </form>
+      <div id="inviteOut" hidden style="margin-top:20px">
+        <div class="alert alert-ok" style="margin-bottom:10px" id="inviteMsg"></div>
+        <label>Access link</label>
+        <div class="copybox"><input type="text" id="inviteUrl" readonly><button class="btn btn-outline btn-sm" type="button" data-copy="inviteUrl">Copy link</button></div>
+        <label style="margin-top:14px">Suggested email</label>
+        <textarea id="inviteEmail" readonly style="min-height:190px;font-size:.88rem"></textarea>
+        <div class="actions" style="margin-top:8px"><button class="btn btn-outline btn-sm" type="button" data-copy="inviteEmail">Copy email text</button></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div><h2>Subscribers</h2><p class="sub">Suspend a firm if an invoice goes unpaid; access stops immediately on every device. More than 3 locations in 30 days may indicate a shared login.</p></div>
+        <button class="btn btn-ghost btn-sm" id="refreshC" type="button">Refresh</button>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Subscriber</th><th>Status</th><th>Activity</th><th>Actions</th></tr></thead>
+        <tbody id="cBody"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <!-- SETUP -->
+  <section data-panel="setup" hidden>
+    <div class="card">
+      <h2>Configuration</h2>
+      <p class="sub">These values are set in Netlify under Project configuration &rsaquo; Environment variables. Nothing secret is shown here.</p>
+      <ul class="checklist" id="setupList"></ul>
+    </div>
+  </section>
+</main>
+
+<dialog id="editDlg">
+  <form method="dialog" class="dialog-body" id="editForm">
+    <h2 class="serif" style="font-size:1.25rem;margin-bottom:16px">Edit webinar</h2>
+    <div class="alert alert-error" id="editErr" hidden></div>
+    <div class="grid-2">
+      <div class="field"><label for="eTitle">Title</label><input type="text" id="eTitle" required maxlength="200"></div>
+      <div class="field"><label for="eWeek">Week of</label><input type="date" id="eWeek" required></div>
+    </div>
+    <div class="field"><label for="eSummary">Summary</label><textarea id="eSummary" maxlength="3000"></textarea></div>
+    <div class="field"><label for="eTopics">Key topics (one per line)</label><textarea id="eTopics"></textarea></div>
+    <div class="field"><label class="check"><input type="checkbox" id="ePublish"> <span>Visible to clients</span></label></div>
+    <div class="dialog-actions">
+      <button class="btn btn-ghost" value="cancel" type="button" id="editCancel">Cancel</button>
+      <button class="btn btn-primary" type="submit" id="editSave">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="previewDlg">
+  <div class="dialog-body">
+    <div class="player" id="previewPlayer"></div>
+    <div class="dialog-actions" style="margin-top:16px"><button class="btn btn-ghost" type="button" id="previewClose">Close</button></div>
+  </div>
+</dialog>
+
+<footer class="footer-mini">CWD Research Consulting &middot; Staff only</footer>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const fmtDate = (iso) => iso ? new Date(iso.length === 10 ? iso + 'T12:00:00Z' : iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+  const fmtDT = (iso) => iso ? new Date(iso).toLocaleString('en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Never';
+  let webinars = [], clients = [], editing = null, upload = null;
+
+  async function api(path, opts = {}) {
+    const res = await fetch(path, { credentials: 'same-origin', ...opts, headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) } });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401 && !path.endsWith('/login')) { show('login'); throw new Error('Please sign in again.'); }
+    if (!res.ok) throw new Error(data.error || 'Request failed');
+    return data;
+  }
+  const post = (p, body = {}, method = 'POST') => api(p, { method, body: JSON.stringify(body) });
+
+  function show(v) { $('loading').hidden = v !== 'loading'; $('login').hidden = v !== 'login'; $('console').hidden = v !== 'console'; $('adminBar').hidden = v !== 'console'; }
+  function msg(id, text) { const a = $(id); a.textContent = text || ''; a.hidden = !text; }
+  function btn(label, cls, fn) { const b = el('button', 'btn btn-sm ' + cls, label); b.type = 'button'; b.addEventListener('click', fn); return b; }
+
+  // ---------- auth
+  async function boot() {
+    try { await api('/api/admin/me'); show('console'); loadStatus(); loadWebinars(); loadClients(); }
+    catch { show('login'); $('adminPw').focus(); }
+  }
+  $('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); msg('loginErr');
+    try { await post('/api/admin/login', { password: $('adminPw').value }); $('adminPw').value = ''; boot(); }
+    catch (err) { msg('loginErr', err.message); }
+  });
+  $('signOut').addEventListener('click', async () => { await post('/api/admin/logout').catch(() => {}); location.reload(); });
+
+  // ---------- tabs
+  document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach((x) => x.classList.toggle('active', x === t));
+    document.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== t.dataset.tab; });
+  }));
+
+  // ---------- setup status
+  async function loadStatus() {
+    try {
+      const s = await api('/api/admin/status');
+      const rows = [
+        ['BUNNY_LIBRARY_ID', s.bunny.libraryId, 'Bunny Stream video library ID'],
+        ['BUNNY_API_KEY', s.bunny.apiKey, 'Bunny Stream library API key (uploads and listing)'],
+        ['BUNNY_TOKEN_KEY', s.bunny.tokenKey, 'Bunny embed token authentication key (secures playback)'],
+        ['SITE_URL', !!s.siteUrl, 'Public site address used in access links (optional)'],
+      ];
+      $('setupList').replaceChildren(...rows.map(([k, ok, d]) => {
+        const li = el('li'); li.append(el('span', 'badge ' + (ok ? 'badge-teal' : 'badge-red'), ok ? 'Set' : 'Missing'));
+        const t = el('div'); t.append(el('strong', '', k)); t.append(el('div', 'hint', d)); li.append(t); return li;
+      }));
+      const missing = !s.bunny.libraryId || !s.bunny.apiKey || !s.bunny.tokenKey;
+      msg('setupWarn', missing ? 'Video storage is not connected yet. Add the Bunny Stream settings in Netlify (see the Setup tab) before uploading. Client accounts can be set up in the meantime.' : '');
+    } catch {}
+  }
+
+  // ---------- webinars
+  function mondayISO() { const d = new Date(); const day = (d.getDay() + 6) % 7; d.setDate(d.getDate() - day); return d.toISOString().slice(0, 10); }
+  $('upWeek').value = mondayISO();
+
+  async function loadWebinars() {
+    try {
+      const data = await api('/api/admin/webinars');
+      webinars = data.webinars;
+      msg('bunnyErr', data.bunnyError ? 'Could not reach video storage: ' + data.bunnyError : '');
+      renderWebinars(); renderUnlinked(data.unlinked || []);
+    } catch (e) { msg('bunnyErr', e.message); }
+  }
+  $('refreshW').addEventListener('click', loadWebinars);
+
+  function renderWebinars() {
+    const body = $('wBody'); body.replaceChildren();
+    if (!webinars.length) { const tr = el('tr'); const td = el('td', '', 'No webinars yet. Upload the first one above.'); td.colSpan = 5; td.style.color = 'var(--gray-500)'; tr.append(td); body.append(tr); return; }
+    for (const w of webinars) {
+      const tr = el('tr');
+      tr.append(el('td', '', fmtDate(w.weekOf)));
+      const t = el('td'); t.append(el('div', '', w.title)); if (w.summary) t.append(el('div', 'muted', w.summary.slice(0, 120) + (w.summary.length > 120 ? '…' : ''))); tr.append(t);
+      const v = el('td'); const label = w.videoStatus + (w.encodeProgress != null && !w.ready && w.encodeProgress > 0 ? ` (${w.encodeProgress}%)` : '');
+      v.append(el('span', 'badge ' + (w.ready ? 'badge-teal' : /Error|failed|Missing/.test(w.videoStatus) ? 'badge-red' : 'badge-amber'), label)); tr.append(v);
+      const p = el('td'); p.append(el('span', 'badge ' + (w.published ? 'badge-teal' : 'badge-gray'), w.published ? (w.ready ? 'Yes' : 'When ready') : 'Hidden')); tr.append(p);
+      const a = el('td'); const acts = el('div', 'actions');
+      acts.append(btn('Preview', 'btn-outline', () => preview(w)));
+      acts.append(btn('Edit', 'btn-ghost', () => openEdit(w)));
+      acts.append(btn(w.published ? 'Hide' : 'Publish', 'btn-ghost', async () => { await post(`/api/admin/webinars/${w.id}`, { published: !w.published }, 'PATCH').catch((e) => alert(e.message)); loadWebinars(); }));
+      if (/Waiting|failed/.test(w.videoStatus)) acts.append(btn('Upload file', 'btn-ghost', () => resumeUpload(w)));
+      acts.append(btn('Remove', 'btn-danger', async () => {
+        if (!confirm(`Remove "${w.title}" from the client library?`)) return;
+        const alsoDelete = confirm('Also permanently delete the video file from storage?\n\nOK = delete the file too. Cancel = keep the file (it will show under "Videos in storage").');
+        await api(`/api/admin/webinars/${w.id}${alsoDelete ? '?deleteVideo=1' : ''}`, { method: 'DELETE' }).catch((e) => alert(e.message));
+        loadWebinars();
+      }));
+      a.append(acts); tr.append(a); body.append(tr);
+    }
+  }
+
+  function renderUnlinked(list) {
+    $('unlinkedWrap').hidden = !list.length;
+    $('uBody').replaceChildren(...list.map((v) => {
+      const tr = el('tr'); tr.append(el('td', '', fmtDate(v.dateUploaded)), el('td', '', v.title), el('td', '', v.status));
+      const a = el('td'); a.append(btn('Add to library', 'btn-outline', () => openEdit({ id: v.id, title: v.title.replace(/^\d{4}-\d{2}-\d{2} \| /, ''), weekOf: (v.dateUploaded || '').slice(0, 10) || mondayISO(), summary: '', topics: [], published: true }, true)));
+      tr.append(a); return tr;
+    }));
+  }
+
+  async function preview(w) {
+    try {
+      const { url } = await api(`/api/admin/webinars/${w.id}/play`);
+      const f = el('iframe'); f.src = url; f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; f.setAttribute('allowfullscreen', '');
+      $('previewPlayer').replaceChildren(f); $('previewDlg').showModal();
+    } catch (e) { alert(e.message); }
+  }
+  $('previewClose').addEventListener('click', () => { $('previewPlayer').replaceChildren(); $('previewDlg').close(); });
+
+  function openEdit(w, importing = false) {
+    editing = { w, importing }; msg('editErr');
+    $('eTitle').value = w.title; $('eWeek').value = w.weekOf; $('eSummary').value = w.summary || '';
+    $('eTopics').value = (w.topics || []).join('\n'); $('ePublish').checked = !!w.published;
+    $('editDlg').querySelector('h2').textContent = importing ? 'Add video to library' : 'Edit webinar';
+    $('editDlg').showModal();
+  }
+  $('editCancel').addEventListener('click', () => $('editDlg').close());
+  $('editForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const body = { title: $('eTitle').value, weekOf: $('eWeek').value, summary: $('eSummary').value, topics: $('eTopics').value, published: $('ePublish').checked };
+    try {
+      if (editing.importing) await post('/api/admin/webinars/import', { videoId: editing.w.id, ...body });
+      else await post(`/api/admin/webinars/${editing.w.id}`, body, 'PATCH');
+      $('editDlg').close(); loadWebinars();
+    } catch (err) { msg('editErr', err.message); }
+  });
+
+  // ---------- upload (resumable, direct to Bunny Stream)
+  function startTus(file, creds, title, onDone) {
+    $('upProgressWrap').hidden = false; $('upCancel').hidden = false; $('upBtn').disabled = true;
+    const started = Date.now();
+    upload = new tus.Upload(file, {
+      endpoint: creds.endpoint,
+      retryDelays: [0, 3000, 10000, 30000, 60000],
+      chunkSize: 50 * 1024 * 1024,
+      headers: creds.headers,
+      metadata: { filetype: file.type || 'video/mp4', title },
+      onError(err) { msg('upErr', 'Upload interrupted: ' + (err.message || err) + '. Click "Upload file" next to the webinar in the library to resume.'); finish(); loadWebinars(); },
+      onProgress(sent, total) {
+        const pct = (sent / total) * 100; $('upBar').style.width = pct.toFixed(1) + '%';
+        const secs = (Date.now() - started) / 1000; const rate = sent / Math.max(secs, 1);
+        const left = rate > 0 ? Math.round((total - sent) / rate / 60) : 0;
+        $('upStatus').textContent = `${pct.toFixed(0)}% of ${(total / 1e9).toFixed(2)} GB uploaded${left ? `, about ${left} min left` : ''}. Keep this tab open.`;
+      },
+      onSuccess() { finish(); onDone(); },
+    });
+    upload.findPreviousUploads().then((prev) => { if (prev.length) upload.resumeFromPreviousUpload(prev[0]); upload.start(); });
+  }
+  function finish() { $('upCancel').hidden = true; $('upBtn').disabled = false; upload = null; }
+  $('upCancel').addEventListener('click', () => { if (upload) { upload.abort(); msg('upErr', 'Upload paused. Choose the same file and click "Upload file" next to the webinar to resume.'); finish(); loadWebinars(); } });
+
+  $('upForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); msg('upErr'); msg('upOk');
+    const file = $('upFile').files[0];
+    if (!file) return msg('upErr', 'Choose the recording file first.');
+    try {
+      $('upBtn').disabled = true;
+      const { webinar, upload: creds } = await post('/api/admin/webinars', {
+        title: $('upTitle').value, weekOf: $('upWeek').value, summary: $('upSummary').value,
+        topics: $('upTopics').value, published: $('upPublish').checked,
+      });
+      loadWebinars();
+      startTus(file, creds, `${webinar.weekOf} | ${webinar.title}`, () => {
+        msg('upOk', `Uploaded. "${webinar.title}" is now processing and will ${webinar.published ? 'appear for clients automatically' : 'be ready to publish'} once finished.`);
+        $('upForm').reset(); $('upWeek').value = mondayISO(); $('upPublish').checked = true; $('upProgressWrap').hidden = true; $('upBar').style.width = '0';
+        loadWebinars();
+      });
+    } catch (err) { msg('upErr', err.message); $('upBtn').disabled = false; }
+  });
+
+  async function resumeUpload(w) {
+    const input = el('input'); input.type = 'file'; input.accept = 'video/*,.mp4,.mkv,.mov';
+    input.addEventListener('change', async () => {
+      const file = input.files[0]; if (!file) return;
+      try { const { upload: creds } = await post(`/api/admin/webinars/${w.id}/upload`); msg('upErr'); startTus(file, creds, `${w.weekOf} | ${w.title}`, () => { msg('upOk', `Uploaded "${w.title}". Processing now.`); $('upProgressWrap').hidden = true; loadWebinars(); }); }
+      catch (e) { msg('upErr', e.message); }
+    });
+    input.click();
+  }
+  window.addEventListener('beforeunload', (e) => { if (upload) { e.preventDefault(); e.returnValue = ''; } });
+
+  // ---------- clients
+  async function loadClients() {
+    try { clients = (await api('/api/admin/users')).users; renderClients(); } catch {}
+  }
+  $('refreshC').addEventListener('click', loadClients);
+
+  function renderClients() {
+    const firms = [...new Set(clients.map((c) => c.firm))];
+    $('firmList').replaceChildren(...firms.map((f) => { const o = el('option'); o.value = f; return o; }));
+    const body = $('cBody'); body.replaceChildren();
+    if (!clients.length) { const tr = el('tr'); const td = el('td', '', 'No subscribers yet.'); td.colSpan = 4; td.style.color = 'var(--gray-500)'; tr.append(td); body.append(tr); return; }
+    for (const firm of firms) {
+      const members = clients.filter((c) => c.firm === firm);
+      const allActive = members.every((c) => c.active);
+      const fr = el('tr', 'firm-row'); const ftd = el('td'); ftd.colSpan = 3; ftd.textContent = `${firm}  (${members.length} ${members.length === 1 ? 'person' : 'people'})`; fr.append(ftd);
+      const fa = el('td'); fa.append(btn(allActive ? 'Suspend firm' : 'Reactivate firm', allActive ? 'btn-danger' : 'btn-outline', async () => {
+        if (allActive && !confirm(`Suspend all ${members.length} subscriber(s) at ${firm}? They will be signed out immediately.`)) return;
+        await post('/api/admin/firms/status', { firm, active: !allActive }).catch((e) => alert(e.message)); loadClients();
+      })); fr.append(fa); body.append(fr);
+      for (const c of members) {
+        const tr = el('tr');
+        const who = el('td'); who.append(el('div', '', c.name)); who.append(el('div', 'muted', c.email)); tr.append(who);
+        const st = el('td'); st.append(el('span', 'badge ' + (!c.active ? 'badge-red' : c.passwordSet ? 'badge-teal' : 'badge-amber'), !c.active ? 'Suspended' : c.passwordSet ? 'Active' : 'Invited')); tr.append(st);
+        const act = el('td');
+        act.append(el('div', 'muted', `Last sign-in: ${fmtDT(c.lastLoginAt)}`));
+        act.append(el('div', 'muted', `Plays: ${c.views}${c.lastViewedAt ? ', last ' + fmtDT(c.lastViewedAt) : ''}`));
+        const loc = el('div', 'muted', `Devices signed in: ${c.activeSessions} · Locations (30d): ${c.distinctIps30d}`);
+        if (c.distinctIps30d > 3) loc.style.color = 'var(--red-700)';
+        act.append(loc); tr.append(act);
+        const a = el('td'); const acts = el('div', 'actions');
+        acts.append(btn(c.passwordSet ? 'New access link' : 'Resend link', 'btn-outline', async () => {
+          try { const { invite } = await post(`/api/admin/users/${c.id}/invite`); showInvite(c, invite, !c.passwordSet); } catch (e) { alert(e.message); }
+        }));
+        if (c.activeSessions) acts.append(btn('Sign out devices', 'btn-ghost', async () => { await post(`/api/admin/users/${c.id}/signout`).catch((e) => alert(e.message)); loadClients(); }));
+        acts.append(btn(c.active ? 'Suspend' : 'Reactivate', 'btn-ghost', async () => { await post(`/api/admin/users/${c.id}`, { active: !c.active }, 'PATCH').catch((e) => alert(e.message)); loadClients(); }));
+        acts.append(btn('Remove', 'btn-danger', async () => {
+          if (!confirm(`Permanently remove ${c.name} (${c.email})?`)) return;
+          await api(`/api/admin/users/${c.id}`, { method: 'DELETE' }).catch((e) => alert(e.message)); loadClients();
+        }));
+        a.append(acts); tr.append(a); body.append(tr);
+      }
+    }
+  }
+
+  function showInvite(c, invite, isNew) {
+    const first = c.name.split(' ')[0];
+    const until = new Date(invite.expiresAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' });
+    $('inviteUrl').value = invite.url;
+    $('inviteMsg').textContent = `Access link created for ${c.name}. It works once and expires on ${until}. Send it from your own email; it is not emailed automatically.`;
+    $('inviteEmail').value = isNew
+      ? `Subject: Your access to the CWD Weekly Markets Webinar\n\nDear ${first},\n\nThank you for subscribing to the Weekly Markets Webinar. Please use the link below to set your password. It is personal to you, works once, and expires on ${until}.\n\n${invite.url}\n\nAfter that, you can sign in at any time at https://cwdresearchconsulting.com/members/ to watch this week's webinar and the full archive.\n\nThanks for reading and best wishes,`
+      : `Subject: Your new access link for the CWD Weekly Markets Webinar\n\nDear ${first},\n\nHere is a new link to reset your password for the Weekly Markets Webinar. It works once and expires on ${until}.\n\n${invite.url}\n\nThanks for reading and best wishes,`;
+    $('inviteOut').hidden = false;
+    document.querySelector('.tab[data-tab="clients"]').click();
+    $('inviteOut').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  $('cForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); msg('cErr');
+    try {
+      const { user, invite } = await post('/api/admin/users', { name: $('cName').value, firm: $('cFirm').value, email: $('cEmail').value });
+      $('cForm').reset(); showInvite(user, invite, true); loadClients();
+    } catch (err) { msg('cErr', err.message); }
+  });
+
+  document.querySelectorAll('[data-copy]').forEach((b) => b.addEventListener('click', async () => {
+    const t = $(b.dataset.copy); t.select();
+    try { await navigator.clipboard.writeText(t.value); } catch { document.execCommand('copy'); }
+    const old = b.textContent; b.textContent = 'Copied'; setTimeout(() => (b.textContent = old), 1500);
+  }));
+
+  boot();
+})();
+</script>
+</body>
+</html>
