@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Weekly Markets Webinar | CWD Research Consulting</title>
+    <meta name="description" content="Chris Darbyshire's weekly CIO-level markets webinar for investment managers and IFAs. Recorded weekly, with the full archive, for £1,000 per month per firm.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-50: #f0fdfa; --teal-100: #ccfbf1; --teal-200: #99f6e4; --teal-300: #5eead4;
+            --teal-400: #2dd4bf; --teal-500: #14b8a6; --teal-600: #0d9488; --teal-700: #0f766e;
+            --teal-800: #115e59; --teal-900: #134e4a; --teal-950: #042f2e;
+            --white: #ffffff; --gray-50: #f9fafb; --gray-100: #f3f4f6; --gray-200: #e5e7eb;
+            --gray-300: #d1d5db; --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563;
+            --gray-700: #374151; --gray-800: #1f2937; --gray-900: #111827;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05); --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.08), 0 4px 6px rgba(0,0,0,0.05);
+            --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+            --transition: 0.2s ease; --transition-smooth: 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+        html{scroll-behavior:smooth;scroll-padding-top:80px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--white);color:var(--gray-800);line-height:1.6;font-size:16px;overflow-x:hidden;}
+
+        .nav{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(255,255,255,0.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid transparent;transition:all var(--transition-smooth);padding:0 24px;}
+        .nav.scrolled{border-bottom-color:var(--gray-200);box-shadow:var(--shadow-sm);}
+        .nav-inner{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:72px;}
+        .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:700;font-size:1.5rem;color:var(--teal-700);letter-spacing:-0.02em;}
+        .nav-links{display:flex;align-items:center;gap:32px;list-style:none;}
+        .nav-links a{text-decoration:none;color:var(--gray-600);font-weight:500;font-size:0.925rem;transition:color var(--transition);position:relative;padding:4px 0;}
+        .nav-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:2px;background:var(--teal-500);border-radius:1px;transition:width var(--transition-smooth);}
+        .nav-links a:hover{color:var(--teal-700);}
+        .nav-links a:hover::after{width:100%;}
+        .nav-cta{background:var(--teal-700);color:var(--white)!important;padding:10px 20px!important;border-radius:var(--radius);font-weight:600!important;white-space:nowrap;}
+        .nav-cta:hover{background:var(--teal-800)!important;color:var(--white)!important;box-shadow:var(--shadow-md);}
+        .nav-cta::after{display:none!important;}
+        .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:8px;z-index:1001;}
+        .nav-hamburger span{display:block;width:26px;height:2.5px;background:var(--gray-700);border-radius:2px;transition:all var(--transition-smooth);}
+        .nav-hamburger.active span:nth-child(1){transform:rotate(45deg) translate(5px,5px);}
+        .nav-hamburger.active span:nth-child(2){opacity:0;}
+        .nav-hamburger.active span:nth-child(3){transform:rotate(-45deg) translate(5px,-5px);}
+        @media (max-width:768px){
+            .nav-links{position:fixed;top:0;right:-100%;width:280px;height:100vh;background:var(--white);flex-direction:column;align-items:flex-start;justify-content:flex-start;padding:100px 32px 32px;gap:24px;box-shadow:var(--shadow-lg);transition:right var(--transition-smooth);}
+            .nav-links.open{right:0;}
+            .nav-hamburger{display:flex;}
+        }
+        .mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:999;opacity:0;pointer-events:none;transition:opacity var(--transition-smooth);}
+        .mobile-overlay.visible{opacity:1;pointer-events:auto;}
+
+        .article-hero{padding:150px 24px 48px;background:linear-gradient(170deg,#ffffff 0%,#f0fdfa 45%,#e6f7f5 100%);}
+        .article-hero-inner{max-width:760px;margin:0 auto;}
+        .article-kicker{display:inline-flex;align-items:center;gap:8px;background:var(--teal-100);color:var(--teal-800);font-weight:600;font-size:0.8rem;padding:7px 16px;border-radius:var(--radius);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:20px;}
+        .article-hero h1{font-family:'Source Serif 4','Georgia',serif;font-size:clamp(2rem,4vw,2.9rem);font-weight:700;line-height:1.2;color:var(--gray-900);letter-spacing:-0.01em;margin-bottom:18px;}
+        .article-dek{font-size:1.15rem;color:var(--gray-600);line-height:1.6;margin-bottom:22px;}
+        .article-meta{display:flex;align-items:center;gap:10px;font-size:0.9rem;color:var(--gray-500);font-weight:500;}
+        .article-meta span.dot{width:4px;height:4px;border-radius:50%;background:var(--gray-400);}
+
+        .article-body{max-width:760px;margin:0 auto;padding:40px 24px 40px;}
+
+        .video-wrap{position:relative;padding-top:56.25%;height:0;overflow:hidden;border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);background:var(--gray-900);}
+        .video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0;}
+
+        .access-note{max-width:680px;margin:24px auto 0;padding:14px 20px;background:var(--teal-50);border:1px solid var(--teal-200);border-radius:var(--radius);font-size:0.85rem;color:var(--teal-800);text-align:center;line-height:1.5;}
+
+        .article-body h2{font-family:'Source Serif 4',serif;font-size:1.4rem;font-weight:700;color:var(--gray-900);margin:40px 0 16px;line-height:1.3;}
+        .agenda-list{list-style:none;display:flex;flex-direction:column;gap:12px;}
+        .agenda-list li{display:flex;align-items:flex-start;gap:12px;font-size:1.02rem;color:var(--gray-700);line-height:1.6;}
+        .agenda-list li::before{content:'';flex:0 0 6px;width:6px;height:6px;border-radius:50%;background:var(--teal-500);margin-top:10px;}
+
+        .article-cta{background:var(--teal-50);border:1px solid var(--teal-200);border-radius:var(--radius-lg);padding:28px 32px;margin-top:44px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+        .article-cta-text strong{display:block;font-size:1.05rem;color:var(--gray-900);margin-bottom:4px;}
+        .article-cta-text p{margin:0;font-size:0.92rem;color:var(--gray-600);}
+        .btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:var(--radius);font-weight:600;font-size:0.92rem;text-decoration:none;border:none;transition:all var(--transition-smooth);font-family:'Inter',sans-serif;white-space:nowrap;}
+        .btn-primary{background:var(--teal-700);color:var(--white);box-shadow:var(--shadow-md);}
+        .btn-primary:hover{background:var(--teal-800);box-shadow:var(--shadow-lg);}
+
+        .footer{background:var(--teal-950);color:var(--gray-300);padding:64px 24px 28px;margin-top:60px;}
+        .footer-inner{max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;padding-bottom:36px;border-bottom:1px solid rgba(255,255,255,0.08);}
+        .footer-brand{font-family:'Source Serif 4',serif;font-weight:700;font-size:1.3rem;color:var(--white);margin-bottom:12px;}
+        .footer-inner p{font-size:0.9rem;line-height:1.7;color:var(--gray-400);}
+        .footer h5{color:var(--white);font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:16px;}
+        .footer ul{list-style:none;display:flex;flex-direction:column;gap:10px;}
+        .footer a{color:var(--gray-400);text-decoration:none;font-size:0.9rem;}
+        .footer a:hover{color:var(--teal-300);}
+        .footer-bottom{max-width:1200px;margin:24px auto 0;font-size:0.8rem;color:var(--gray-500);text-align:center;}
+
+        @media (max-width:640px){
+            .footer-inner{grid-template-columns:1fr;}
+            .article-cta{flex-direction:column;align-items:flex-start;}
+        }
+
+        .hero-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px;}
+        .btn-outline{background:var(--white);color:var(--teal-800);border:1px solid var(--teal-200);}
+        .btn-outline:hover{border-color:var(--teal-500);background:var(--teal-50);}
+        .wb-wrap{max-width:1100px;margin:0 auto;padding:56px 24px 0;}
+        .wb-grid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:40px;align-items:start;}
+        .wb-section h2{font-family:'Source Serif 4',serif;font-size:1.55rem;font-weight:700;color:var(--gray-900);margin-bottom:14px;line-height:1.3;}
+        .wb-section > p{color:var(--gray-600);margin-bottom:22px;}
+        .wb-cover{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-bottom:48px;}
+        .wb-cover-item{border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:20px;background:var(--white);}
+        .wb-cover-item h3{font-size:1rem;font-weight:700;color:var(--gray-900);margin-bottom:6px;}
+        .wb-cover-item p{font-size:.9rem;color:var(--gray-600);line-height:1.55;}
+        .wb-steps{list-style:none;counter-reset:step;display:flex;flex-direction:column;gap:14px;margin-bottom:48px;}
+        .wb-steps li{counter-increment:step;display:grid;grid-template-columns:36px minmax(0,1fr);gap:14px;align-items:start;}
+        .wb-steps li::before{content:counter(step);width:36px;height:36px;border-radius:50%;background:var(--teal-700);color:var(--white);font-weight:700;display:flex;align-items:center;justify-content:center;font-size:.95rem;}
+        .wb-steps strong{display:block;color:var(--gray-900);margin-bottom:2px;}
+        .wb-steps span{color:var(--gray-600);font-size:.93rem;}
+        .wb-presenter{display:flex;gap:18px;align-items:flex-start;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-lg);padding:22px;}
+        .wb-presenter p{font-size:.93rem;color:var(--gray-600);}
+        .wb-presenter strong{color:var(--gray-900);}
+        .price-card{position:sticky;top:96px;background:var(--white);border:1px solid var(--teal-200);border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);padding:28px;}
+        .price-label{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--teal-700);margin-bottom:8px;}
+        .price{font-family:'Source Serif 4',serif;font-size:2.6rem;font-weight:700;color:var(--gray-900);line-height:1.1;}
+        .price small{font-family:'Inter',sans-serif;font-size:1rem;font-weight:500;color:var(--gray-500);}
+        .price-sub{font-size:.88rem;color:var(--gray-500);margin:6px 0 18px;}
+        .price-list{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:22px;padding-top:18px;border-top:1px solid var(--gray-100);}
+        .price-list li{display:flex;gap:10px;font-size:.92rem;color:var(--gray-700);line-height:1.45;}
+        .price-list li::before{content:'';flex:0 0 16px;height:16px;margin-top:2px;border-radius:50%;background:var(--teal-100) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230f766e' stroke-width='3.5'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") center/10px no-repeat;}
+        .price-card .btn{width:100%;justify-content:center;}
+        .price-card .signin{display:block;text-align:center;margin-top:12px;font-size:.88rem;color:var(--gray-500);}
+        .price-card .signin a{color:var(--teal-700);font-weight:600;}
+        .request{background:var(--teal-50);border-top:1px solid var(--teal-100);border-bottom:1px solid var(--teal-100);margin-top:64px;padding:56px 24px;}
+        .request-inner{max-width:720px;margin:0 auto;}
+        .request h2{font-family:'Source Serif 4',serif;font-size:1.6rem;font-weight:700;color:var(--gray-900);margin-bottom:8px;}
+        .request > .request-inner > p{color:var(--gray-600);margin-bottom:24px;}
+        .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;}
+        .form-grid .full{grid-column:1/-1;}
+        .form-grid label{display:block;font-size:.85rem;font-weight:600;color:var(--gray-700);margin-bottom:6px;}
+        .form-grid input,.form-grid textarea,.form-grid select{width:100%;padding:11px 13px;border:1px solid var(--gray-300);border-radius:var(--radius);font:inherit;font-size:.95rem;background:var(--white);color:var(--gray-900);}
+        .form-grid textarea{min-height:96px;resize:vertical;}
+        .form-grid input:focus,.form-grid textarea:focus,.form-grid select:focus{outline:none;border-color:var(--teal-500);box-shadow:0 0 0 3px rgba(20,184,166,.18);}
+        .hp{position:absolute;left:-9999px;}
+        .form-note{font-size:.82rem;color:var(--gray-500);margin-top:12px;}
+        .form-msg{padding:14px 16px;border-radius:var(--radius);font-size:.92rem;margin-top:16px;}
+        .form-msg.ok{background:var(--white);border:1px solid var(--teal-200);color:var(--teal-800);}
+        .form-msg.err{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;}
+        .wb-disclaimer{max-width:1100px;margin:28px auto 0;padding:0 24px;font-size:.8rem;color:var(--gray-500);}
+        @media (max-width:900px){ .wb-grid{grid-template-columns:1fr;} .price-card{position:static;} }
+        .article-meta{flex-wrap:wrap;row-gap:4px;}
+        @media (max-width:640px){ .wb-cover,.form-grid{grid-template-columns:1fr;} .wb-wrap{padding:40px 16px 0;} .request{padding:44px 16px;} .article-hero{padding:120px 16px 40px;} }
+    </style>
+    <style>/* nav fit with Weekly Webinar + Client Login links (Oct 2026) */
+        .nav-links a{white-space:nowrap;}
+        @media (min-width:769px) and (max-width:1199px){ .nav-links{gap:18px!important;} .nav-links a{font-size:0.85rem!important;} .nav-cta{padding:9px 14px!important;} }
+        @media (min-width:769px) and (max-width:979px){ .nav-links li:has(> a[href$="#why-us"]){display:none!important;} .nav-links{gap:14px!important;} .nav-links a{font-size:0.8rem!important;} }
+    </style>
+</head>
+<body>
+    <nav class="nav" id="navbar">
+        <div class="nav-inner">
+            <a href="index.html" class="nav-logo" aria-label="CWD Home">CWD Consulting</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html#about">About</a></li>
+                <li><a href="insights.html">Insights</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#why-us">Why CWD</a></li>
+                <li><a href="webinar.html">Weekly Webinar</a></li>
+                <li><a href="podcast.html">Podcast</a></li>
+                <li><a href="members/">Client Login</a></li>
+                <li><a href="mailto:chris@cwdresearchconsulting.com" class="nav-cta">Contact the Team</a></li>
+            </ul>
+            <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+        </div>
+    </nav>
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+    <header class="article-hero">
+        <div class="article-hero-inner" style="max-width:1052px;">
+            <span class="article-kicker">Subscription &middot; For Investment Professionals</span>
+            <h1>The Weekly Markets Webinar</h1>
+            <p class="article-dek" style="max-width:720px;">Chris Darbyshire's CIO-level view of the week in markets, recorded every week for subscribing firms. Your team watches when it suits them, with every past session kept in a searchable archive.</p>
+            <div class="article-meta">
+                <span>Weekly</span><span class="dot"></span><span>&pound;1,000 per month per firm</span><span class="dot"></span><span>Invoiced monthly</span>
+            </div>
+            <div class="hero-actions">
+                <a href="#request" class="btn btn-primary">Request access</a>
+                <a href="members/" class="btn btn-outline">Subscriber sign in</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="wb-wrap">
+        <div class="wb-grid">
+            <div class="wb-section">
+                <h2>What each webinar covers</h2>
+                <p>Each week Chris draws on a wide range of the world's leading research houses, macro strategists and independent economists, and filters it through an institutional CIO lens. The webinar brings that together in one focused session.</p>
+                <div class="wb-cover">
+                    <div class="wb-cover-item"><h3>Macro top-down briefing</h3><p>The week's main economic, political and trade-related events, with the charts and data behind them.</p></div>
+                    <div class="wb-cover-item"><h3>Cross-asset market update</h3><p>A review of the asset classes used in multi-asset portfolios: equities, bonds, currencies, commodities and alternatives.</p></div>
+                    <div class="wb-cover-item"><h3>Thematic updates</h3><p>The themes driving markets right now, such as AI financing, tariffs and geopolitics, and what they mean for portfolios.</p></div>
+                    <div class="wb-cover-item"><h3>Tactical investment ideas</h3><p>Ideas explained from conception to execution, so your investment committee can weigh them on their merits.</p></div>
+                </div>
+
+                <h2>How access works</h2>
+                <ol class="wb-steps">
+                    <li><div><strong>Request access</strong><span>Tell us about your firm using the form below, and Chris or Michael will be in touch.</span></div></li>
+                    <li><div><strong>Agree terms</strong><span>We confirm the people at your firm who need access and invoice monthly.</span></div></li>
+                    <li><div><strong>Personal logins</strong><span>Each named person receives a private link to set their own password.</span></div></li>
+                    <li><div><strong>Watch each week</strong><span>Sign in on any device to watch this week's webinar or search the full archive.</span></div></li>
+                </ol>
+
+                <div class="wb-presenter">
+                    <div>
+                        <p><strong>Presented by Chris Darbyshire</strong>, CEO and Founder of CWD Consulting. Over two decades in investment management, including CIO roles at 7IM and Walker Crips, with a reputation for incisive macro analysis, disciplined asset allocation and clear strategic thinking.</p>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="price-card" aria-label="Pricing">
+                <div class="price-label">Subscription</div>
+                <div class="price">&pound;1,000 <small>/ month</small></div>
+                <div class="price-sub">Per firm, invoiced monthly</div>
+                <ul class="price-list">
+                    <li>A new recorded webinar every week</li>
+                    <li>The full archive of past webinars</li>
+                    <li>Personal, secure logins for your team</li>
+                    <li>Watch on desktop, tablet or phone</li>
+                    <li>End at any month-end with notice</li>
+                </ul>
+                <a href="#request" class="btn btn-primary">Request access</a>
+                <span class="signin">Already a subscriber? <a href="members/">Sign in</a></span>
+            </aside>
+        </div>
+    </div>
+
+    <section class="request" id="request">
+        <div class="request-inner">
+            <h2>Request access</h2>
+            <p>Leave your details and we will come back to you within one working day to set up access for your firm.</p>
+            <form id="requestForm" name="webinar-access-requests" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+                <input type="hidden" name="form-name" value="webinar-access-requests">
+                <p class="hp"><label>Leave this empty: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+                <div class="form-grid">
+                    <div><label for="rqName">Full name</label><input id="rqName" name="name" type="text" autocomplete="name" required maxlength="120"></div>
+                    <div><label for="rqFirm">Firm</label><input id="rqFirm" name="firm" type="text" autocomplete="organization" required maxlength="120"></div>
+                    <div><label for="rqEmail">Work email</label><input id="rqEmail" name="email" type="email" autocomplete="email" required maxlength="254"></div>
+                    <div><label for="rqRole">Role</label><input id="rqRole" name="role" type="text" autocomplete="organization-title" maxlength="120"></div>
+                    <div><label for="rqSeats">People needing access</label><select id="rqSeats" name="seats"><option>1</option><option>2 to 3</option><option>4 to 6</option><option>7 or more</option></select></div>
+                    <div><label for="rqPhone">Phone (optional)</label><input id="rqPhone" name="phone" type="tel" autocomplete="tel" maxlength="40"></div>
+                    <div class="full"><label for="rqMsg">Anything we should know? (optional)</label><textarea id="rqMsg" name="message" maxlength="2000"></textarea></div>
+                </div>
+                <div style="margin-top:18px;"><button type="submit" class="btn btn-primary" id="rqBtn">Send request</button></div>
+                <p class="form-note">We use these details only to respond to your request. See our <a href="privacy-policy.html">Privacy Policy</a> and the <a href="webinar-terms.html">terms of access</a>.</p>
+                <div class="form-msg" id="rqMsgOut" hidden></div>
+            </form>
+        </div>
+    </section>
+
+    <p class="wb-disclaimer">The Weekly Markets Webinar is general market commentary for investment professionals. It is not a personal recommendation or investment advice. Short clips from recent webinars are published on <a href="https://www.youtube.com/@CWDResearchConsulting" style="color:var(--teal-700);">our YouTube channel</a>.</p>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>
+                <div class="footer-brand">CWD Consulting</div>
+                <p>World-class investment research and strategic consulting for independent financial advisors and boutique investment management firms. In a flood of information, we deliver insight.</p>
+                <p style="margin-top:10px;"><a href="index.html" style="color:var(--teal-300);font-weight:600;">&larr; Back to CWD Consulting</a></p>
+            </div>
+            <div>
+                <h5>Services</h5>
+                <ul>
+                    <li><a href="index.html#services">Weekly Intelligence Brief</a></li>
+                    <li><a href="index.html#services">Full Services</a></li>
+                    <li><a href="index.html#services">Research</a></li>
+                    <li><a href="index.html#services">Asset Allocation</a></li>
+                    <li><a href="webinar.html">Weekly Markets Webinar</a></li>
+                    <li><a href="podcast.html">The CIO's Diary (Podcast)</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5>Contact</h5>
+                <ul>
+                    <li><a href="mailto:chris@cwdresearchconsulting.com">Email Chris</a></li>
+                    <li><a href="index.html#why-us">About Chris Darbyshire</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">&copy; <span id="currentYear"></span> CWD Consulting. All rights reserved. | Designed for independent investment professionals. | <a href="privacy-policy.html" style="color:var(--gray-400);text-decoration:underline;">Privacy Policy</a> &middot; <a href="terms-of-use.html" style="color:var(--gray-400);text-decoration:underline;">Terms of Use</a></div>
+    </footer>
+
+    <script>
+        (function() {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            const navbar = document.getElementById('navbar');
+            window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 20); }, { passive: true });
+            const hamburger = document.getElementById('navHamburger');
+            const navLinks = document.getElementById('navLinks');
+            const mobileOverlay = document.getElementById('mobileOverlay');
+            const closeMenu = () => {
+                hamburger.classList.remove('active'); navLinks.classList.remove('open');
+                mobileOverlay.classList.remove('visible'); hamburger.setAttribute('aria-expanded','false');
+                document.body.style.overflow = '';
+            };
+            const openMenu = () => {
+                hamburger.classList.add('active'); navLinks.classList.add('open');
+                mobileOverlay.classList.add('visible'); hamburger.setAttribute('aria-expanded','true');
+                document.body.style.overflow = 'hidden';
+            };
+            hamburger.addEventListener('click', () => hamburger.classList.contains('active') ? closeMenu() : openMenu());
+            mobileOverlay.addEventListener('click', closeMenu);
+            navLinks.querySelectorAll('a').forEach(link => { link.addEventListener('click', () => { if (window.innerWidth <= 768) closeMenu(); }); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && hamburger.classList.contains('active')) closeMenu(); });
+            window.addEventListener('resize', () => { if (window.innerWidth > 768 && hamburger.classList.contains('active')) closeMenu(); });
+        })();
+    </script>
+
+    <script>
+        (function () {
+            const form = document.getElementById('requestForm');
+            const out = document.getElementById('rqMsgOut');
+            const btn = document.getElementById('rqBtn');
+            const show = (cls, text) => { out.className = 'form-msg ' + cls; out.textContent = text; out.hidden = false; };
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const f = form.elements; const name = f['name'].value.trim(), firm = f['firm'].value.trim(), email = f['email'].value.trim();
+                if (!name || !firm || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { show('err', 'Please add your name, firm and a valid work email.'); return; }
+                btn.disabled = true; btn.textContent = 'Sending...';
+                try {
+                    const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(new FormData(form)).toString() });
+                    if (!res.ok) throw new Error();
+                    form.querySelectorAll('input:not([type=hidden]),textarea').forEach((i) => (i.value = ''));
+                    show('ok', 'Thank you. Your request has reached us and we will be in touch within one working day.');
+                } catch {
+                    show('err', 'Sorry, that did not send. Please email chris@cwdresearchconsulting.com and we will set you up directly.');
+                } finally { btn.disabled = false; btn.textContent = 'Send request'; }
+            });
+        })();
+    </script>
+</body>
+</html>

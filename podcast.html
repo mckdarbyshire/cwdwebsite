@@ -1816,6 +1816,11 @@
             width: 100%;
         }
     </style>
+    <style>/* nav fit with Weekly Webinar + Client Login links (Oct 2026) */
+        .nav-links a{white-space:nowrap;}
+        @media (min-width:769px) and (max-width:1199px){ .nav-links{gap:18px!important;} .nav-links a{font-size:0.85rem!important;} .nav-cta{padding:9px 14px!important;} }
+        @media (min-width:769px) and (max-width:979px){ .nav-links li:has(> a[href$="#why-us"]){display:none!important;} .nav-links{gap:14px!important;} .nav-links a{font-size:0.8rem!important;} }
+    </style>
 </head>
 <body>
     <div class="mobile-overlay" id="mobileOverlay"></div>
@@ -1831,7 +1836,9 @@
                 <li><a href="insights.html">Insights</a></li>
                 <li><a href="index.html#services">Services</a></li>
                 <li><a href="index.html#why-us">Why CWD</a></li>
+                <li><a href="webinar.html">Weekly Webinar</a></li>
                 <li><a href="podcast.html" class="nav-active" aria-current="page">Podcast</a></li>
+                <li><a href="members/">Client Login</a></li>
                 <li><a href="#" class="nav-cta contact-trigger">Contact the Team</a></li>
             </ul>
             <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
@@ -1988,6 +1995,7 @@
                     <li><a href="index.html#services">Full Services</a></li>
                     <li><a href="index.html#services">Research</a></li>
                     <li><a href="index.html#services">Asset Allocation</a></li>
+                    <li><a href="webinar.html">Weekly Markets Webinar</a></li>
                     <li><a href="podcast.html">The CIO's Diary (Podcast)</a></li>
                 </ul>
             </div>

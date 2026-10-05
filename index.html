@@ -1712,6 +1712,31 @@
             opacity: 1;
             pointer-events: auto;
         }
+
+        /* Weekly Markets Webinar feature (Oct 2026) */
+        .webinar-feature{background:var(--teal-950);color:var(--gray-300);}
+        .webinar-feature .section-inner{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:48px;align-items:center;}
+        .webinar-feature .section-label{color:var(--teal-300);}
+        .webinar-feature .section-title{color:var(--white);}
+        .webinar-feature .section-subtitle{color:var(--gray-300);max-width:none;}
+        .webinar-feature-points{list-style:none;display:flex;flex-direction:column;gap:10px;margin:22px 0 28px;}
+        .webinar-feature-points li{display:flex;gap:10px;font-size:.98rem;color:var(--gray-200);}
+        .webinar-feature-points li::before{content:'';flex:0 0 6px;height:6px;border-radius:50%;background:var(--teal-400);margin-top:10px;}
+        .webinar-feature-actions{display:flex;gap:12px;flex-wrap:wrap;}
+        .webinar-feature .btn-ghost-light{display:inline-flex;align-items:center;padding:14px 26px;border-radius:var(--radius);font-weight:600;font-size:.95rem;color:var(--white);border:1px solid rgba(255,255,255,.3);text-decoration:none;transition:all .2s ease;}
+        .webinar-feature .btn-ghost-light:hover{border-color:var(--teal-300);color:var(--teal-200);}
+        .webinar-price{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:32px;text-align:center;}
+        .webinar-price-amount{font-family:'Source Serif 4',Georgia,serif;font-size:3rem;font-weight:700;color:var(--white);line-height:1.1;}
+        .webinar-price-amount small{font-family:'Inter',sans-serif;font-size:1rem;font-weight:500;color:var(--gray-400);}
+        .webinar-price-sub{font-size:.9rem;color:var(--gray-400);margin-top:6px;}
+        .webinar-price-divider{height:1px;background:rgba(255,255,255,.12);margin:22px 0;}
+        .webinar-price-note{font-size:.88rem;color:var(--gray-300);line-height:1.6;}
+        @media (max-width:900px){ .webinar-feature .section-inner{grid-template-columns:1fr;gap:32px;} }
+    </style>
+    <style>/* nav fit with Weekly Webinar + Client Login links (Oct 2026) */
+        .nav-links a{white-space:nowrap;}
+        @media (min-width:769px) and (max-width:1199px){ .nav-links{gap:18px!important;} .nav-links a{font-size:0.85rem!important;} .nav-cta{padding:9px 14px!important;} }
+        @media (min-width:769px) and (max-width:979px){ .nav-links li:has(> a[href$="#why-us"]){display:none!important;} .nav-links{gap:14px!important;} .nav-links a{font-size:0.8rem!important;} }
     </style>
 </head>
 <body>
@@ -1727,7 +1752,9 @@
                 <li><a href="insights.html">Insights</a></li>
                 <li><a href="#services">Services</a></li>
                 <li><a href="#why-us">Why CWD</a></li>
+                <li><a href="webinar.html">Weekly Webinar</a></li>
                 <li><a href="podcast.html">Podcast</a></li>
+                <li><a href="members/">Client Login</a></li>
                 <li><a href="#" class="nav-cta contact-trigger">Contact the Team</a></li>
             </ul>
             <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
@@ -1761,6 +1788,31 @@
                         <li>Risk monitoring &amp; governance</li>
                     </ul>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section webinar-feature" id="weekly-webinar">
+        <div class="section-inner">
+            <div>
+                <span class="section-label">Our Flagship Service</span>
+                <h2 class="section-title">The Weekly Markets Webinar</h2>
+                <p class="section-subtitle">Every week Chris Darbyshire records a CIO-level briefing on the macro picture, cross-asset markets, the themes driving them and tactical investment ideas. Subscribing firms watch when it suits them and keep the full archive to hand.</p>
+                <ul class="webinar-feature-points">
+                    <li>A new recorded webinar every week</li>
+                    <li>The complete archive of past sessions</li>
+                    <li>Secure, personal logins for your team</li>
+                </ul>
+                <div class="webinar-feature-actions">
+                    <a href="webinar.html" class="btn btn-primary">See how it works</a>
+                    <a href="members/" class="btn-ghost-light">Subscriber sign in</a>
+                </div>
+            </div>
+            <div class="webinar-price">
+                <div class="webinar-price-amount">&pound;1,000 <small>/ month</small></div>
+                <div class="webinar-price-sub">Per firm, invoiced monthly</div>
+                <div class="webinar-price-divider"></div>
+                <p class="webinar-price-note">Built to empower individuals in the investment process with institutional-grade market thinking, without building a research team.</p>
             </div>
         </div>
     </section>
@@ -1966,6 +2018,7 @@
                     <li><a href="#services">Full Services</a></li>
                     <li><a href="#services">Research</a></li>
                     <li><a href="#services">Asset Allocation</a></li>
+                    <li><a href="webinar.html">Weekly Markets Webinar</a></li>
                     <li><a href="podcast.html">The CIO's Diary (Podcast)</a></li>
                 </ul>
             </div>
