@@ -1,6 +1,7 @@
 // CWD staff console API: manage client accounts and the webinar library.
 import type { Config, Context } from "@netlify/functions";
 import {
+  assertSameOrigin,
   clearAdminCookie,
   createInvite,
   db,
@@ -16,6 +17,10 @@ import {
   json,
   listUsers,
   normEmail,
+  PDF_MAX_BYTES,
+  pdfDownloadName,
+  pdfKey,
+  pdfResponse,
   randomToken,
   rateLimit,
   readJson,
@@ -60,6 +65,7 @@ function adminUserView(u: User) {
     views: (u.views || []).length,
     lastViewedAt: lastView?.at || null,
     lastViewedId: lastView?.id || null,
+    pdfDownloads: (u.downloads || []).length,
   };
 }
 
@@ -273,7 +279,43 @@ export default async (req: Request, context: Context) => {
       if (sub === "play" && m === "GET") {
         return json(signedEmbedUrl(w.id));
       }
+
+      // "This week in 10 minutes" PDF: one per webinar, sent as the raw request body.
+      if (sub === "pdf" && m === "PUT") {
+        assertSameOrigin(req);
+        if (!(req.headers.get("content-type") || "").includes("application/pdf")) {
+          throw new HttpError(415, "Please choose a PDF file.");
+        }
+        const declared = Number(req.headers.get("content-length") || 0);
+        if (declared > PDF_MAX_BYTES) throw new HttpError(413, "That PDF is too large (4 MB maximum).");
+        const bytes = await req.arrayBuffer();
+        if (!bytes.byteLength) throw new HttpError(400, "That file is empty.");
+        if (bytes.byteLength > PDF_MAX_BYTES) throw new HttpError(413, "That PDF is too large (4 MB maximum).");
+        const head = new TextDecoder().decode(new Uint8Array(bytes.slice(0, 5)));
+        if (head !== "%PDF-") throw new HttpError(415, "That file is not a valid PDF.");
+        const name = str(decodeURIComponent(req.headers.get("x-file-name") || ""), 200) || pdfDownloadName(w);
+        await db().set(pdfKey(w.id), bytes);
+        w.pdf = { name, size: bytes.byteLength, uploadedAt: now() };
+        w.updatedAt = now();
+        await saveCatalogue(catalogue);
+        return json({ webinar: w });
+      }
+      if (sub === "pdf" && m === "GET") {
+        const bytes = (await db().get(pdfKey(w.id), { type: "arrayBuffer" })) as ArrayBuffer | null;
+        if (!bytes || !w.pdf) throw new HttpError(404, "No PDF attached to this webinar.");
+        return pdfResponse(bytes, pdfDownloadName(w), "inline");
+      }
+      if (sub === "pdf" && m === "DELETE") {
+        assertSameOrigin(req);
+        await db().delete(pdfKey(w.id));
+        delete w.pdf;
+        w.updatedAt = now();
+        await saveCatalogue(catalogue);
+        return json({ webinar: w });
+      }
+
       if (!sub && m === "DELETE") {
+        await db().delete(pdfKey(w.id));
         if (url.searchParams.get("deleteVideo") === "1") await deleteVideo(w.id);
         await saveCatalogue(catalogue.filter((x) => x.id !== w.id));
         return json({ ok: true });

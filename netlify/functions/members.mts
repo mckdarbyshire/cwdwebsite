@@ -1,10 +1,15 @@
-// Subscriber-only webinar library: the catalogue and signed playback links.
+// Subscriber-only webinar library: the catalogue, signed playback links and
+// each week's "This week in 10 minutes" PDF.
 import type { Config, Context } from "@netlify/functions";
 import {
+  db,
   getCatalogue,
   handleError,
   HttpError,
   json,
+  pdfDownloadName,
+  pdfKey,
+  pdfResponse,
   requireMember,
   saveCatalogue,
   saveUser,
@@ -50,6 +55,7 @@ export default async (req: Request, _context: Context) => {
         summary: w.summary,
         topics: w.topics,
         lengthSec: w.lengthSec ?? null,
+        hasPdf: !!w.pdf,
       }));
       const watched = new Set((user.views || []).map((v) => v.id));
       return json({
@@ -68,6 +74,17 @@ export default async (req: Request, _context: Context) => {
       return json({ embedUrl: signed.url, expiresAt: signed.expiresAt, title: webinar.title });
     }
 
+    if (action === "pdf") {
+      const id = str(url.searchParams.get("id"), 64);
+      const webinar = (await getCatalogue()).find((w) => w.id === id && w.published && w.ready && w.pdf);
+      if (!webinar) throw new HttpError(404, "That summary is not available.");
+      const bytes = (await db().get(pdfKey(webinar.id), { type: "arrayBuffer" })) as ArrayBuffer | null;
+      if (!bytes) throw new HttpError(404, "That summary is not available.");
+      user.downloads = [...(user.downloads || []), { id: webinar.id, at: new Date().toISOString() }].slice(-200);
+      await saveUser(user);
+      return pdfResponse(bytes, pdfDownloadName(webinar), "attachment");
+    }
+
     return json({ error: "Not found" }, 404);
   } catch (err) {
     return handleError(err);
@@ -75,5 +92,5 @@ export default async (req: Request, _context: Context) => {
 };
 
 export const config: Config = {
-  path: ["/api/members/webinars", "/api/members/play"],
+  path: ["/api/members/webinars", "/api/members/play", "/api/members/pdf"],
 };

@@ -65,6 +65,7 @@ export type User = {
   sessions: Session[];
   logins: { at: string; ip?: string }[];
   views: { id: string; at: string }[];
+  downloads?: { id: string; at: string }[];
 };
 
 export type Webinar = {
@@ -78,7 +79,32 @@ export type Webinar = {
   updatedAt: string;
   lengthSec?: number;
   ready?: boolean; // true once Bunny has finished processing the video
+  pdf?: WebinarPdf; // optional "This week in 10 minutes" summary
 };
+
+export type WebinarPdf = { name: string; size: number; uploadedAt: string };
+
+// The PDF bytes live in Blobs beside the catalogue, one per webinar.
+export const pdfKey = (webinarId: string) => `files/webinar-pdf/${webinarId}`;
+export const PDF_MAX_BYTES = 4 * 1024 * 1024;
+
+export function pdfDownloadName(w: Webinar): string {
+  return `CWD_This_Week_in_10_Minutes_${w.weekOf}.pdf`;
+}
+
+export function pdfResponse(bytes: ArrayBuffer, filename: string, disposition: "inline" | "attachment"): Response {
+  return new Response(bytes, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Length": String(bytes.byteLength),
+      "Content-Disposition": `${disposition}; filename="${filename.replace(/[^A-Za-z0-9._-]/g, "_")}"`,
+      "Cache-Control": "private, no-store",
+      "X-Content-Type-Options": "nosniff",
+      "X-Robots-Tag": "noindex, nofollow",
+    },
+  });
+}
 
 export const emailKey = (email: string) => `email/${sha256(normEmail(email))}`;
 export const userKey = (id: string) => `users/${id}`;

@@ -66,6 +66,10 @@
       <div class="meta" id="featMeta"></div>
       <p class="summary" id="featSummary"></p>
       <ul class="topics" id="featTopics"></ul>
+      <a class="pdf-card" id="featPdf" hidden download>
+        <span class="pdf-icon" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M12 12v6"/><path d="m9 15 3 3 3-3"/></svg></span>
+        <span><strong>This week in 10 minutes</strong><span class="pdf-sub">Summary of the webinar (PDF)</span></span>
+      </a>
     </div>
   </section>
 
@@ -147,6 +151,8 @@
     $('featSummary').textContent = w.summary || '';
     $('featSummary').hidden = !w.summary;
     const ul = $('featTopics'); ul.replaceChildren(...(w.topics || []).map((t) => el('li', '', t)));
+    const pdf = $('featPdf'); pdf.hidden = !w.hasPdf;
+    if (w.hasPdf) pdf.href = '/api/members/pdf?id=' + encodeURIComponent(w.id);
     // reset the player to the poster for the newly selected webinar
     const player = $('player'); player.querySelectorAll('iframe,.watermark').forEach((n) => n.remove());
     $('poster').hidden = false;
@@ -190,7 +196,7 @@
 
   function renderArchive() {
     const q = $('search').value.trim().toLowerCase();
-    const list = items.filter((w) => !q || [w.title, w.summary, ...(w.topics || [])].join(' ').toLowerCase().includes(q));
+    const list = items.filter((w) => !q || [w.title, w.summary, ...(w.topics || []), w.hasPdf ? 'pdf summary' : ''].join(' ').toLowerCase().includes(q));
     const box = $('archive'); box.replaceChildren();
     let month = '';
     for (const w of list) {
@@ -204,6 +210,7 @@
       row.appendChild(mid);
       const side = el('div', 'row-side');
       if (w.lengthSec) side.appendChild(el('span', '', fmtLen(w.lengthSec)));
+      if (w.hasPdf) side.appendChild(el('span', 'badge badge-gray', 'PDF'));
       if (w === items[0]) side.appendChild(el('span', 'badge badge-teal', 'Latest'));
       if (w.watched) side.appendChild(el('span', 'badge badge-gray', 'Watched'));
       row.appendChild(side);

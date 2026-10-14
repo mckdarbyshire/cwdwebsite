@@ -50,7 +50,7 @@
   <section data-panel="webinars">
     <div class="card">
       <h2>Upload this week's webinar</h2>
-      <p class="sub">Choose the OBS recording (MP4 recommended). It goes straight to secure video storage and appears in the client library once processing finishes, usually within a few minutes of the upload completing.</p>
+      <p class="sub">Choose the OBS recording (MP4 recommended). It goes straight to secure video storage and appears in the client library once processing finishes, usually within a few minutes of the upload completing. Attach the week's 10-minute PDF here too, or add it later from the library.</p>
       <div class="alert alert-error" id="upErr" hidden></div>
       <div class="alert alert-ok" id="upOk" hidden></div>
       <form id="upForm">
@@ -61,6 +61,7 @@
         <div class="field"><label for="upSummary">Summary <span class="hint" style="display:inline">(shown to clients)</span></label><textarea id="upSummary" maxlength="3000" placeholder="Two or three sentences on what this week's webinar covers."></textarea></div>
         <div class="field"><label for="upTopics">Key topics <span class="hint" style="display:inline">(one per line, up to 8)</span></label><textarea id="upTopics" placeholder="US payrolls and the Fed path&#10;Hormuz and the oil risk premium&#10;Positioning: where we are adding duration"></textarea></div>
         <div class="field"><label for="upFile">Recording</label><input type="file" id="upFile" accept="video/*,.mp4,.mkv,.mov" required></div>
+        <div class="field"><label for="upPdf">This week in 10 minutes <span class="hint" style="display:inline">(PDF, optional, up to 4 MB; subscribers can download it beside the video)</span></label><input type="file" id="upPdf" accept="application/pdf,.pdf"></div>
         <div class="field"><label class="check"><input type="checkbox" id="upPublish" checked> <span>Publish to clients automatically when ready</span></label></div>
         <div id="upProgressWrap" hidden>
           <div class="progress"><div id="upBar"></div></div>
@@ -183,6 +184,26 @@
 
   function show(v) { $('loading').hidden = v !== 'loading'; $('login').hidden = v !== 'login'; $('console').hidden = v !== 'console'; $('adminBar').hidden = v !== 'console'; }
   function msg(id, text) { const a = $(id); a.textContent = text || ''; a.hidden = !text; }
+  async function uploadPdf(id, file) {
+    if (!/\.pdf$/i.test(file.name) && file.type !== 'application/pdf') throw new Error('Please choose a PDF file.');
+    if (file.size > 4 * 1024 * 1024) throw new Error('That PDF is too large (4 MB maximum).');
+    const res = await fetch(`/api/admin/webinars/${id}/pdf`, { method: 'PUT', credentials: 'same-origin', body: file,
+      headers: { 'Content-Type': 'application/pdf', 'X-File-Name': encodeURIComponent(file.name) } });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401) { show('login'); throw new Error('Please sign in again.'); }
+    if (!res.ok) throw new Error(data.error || 'PDF upload failed');
+    return data.webinar;
+  }
+  function pickPdf(w) {
+    const input = el('input'); input.type = 'file'; input.accept = 'application/pdf,.pdf';
+    input.addEventListener('change', async () => {
+      const file = input.files[0]; if (!file) return;
+      try { await uploadPdf(w.id, file); msg('upOk', `PDF attached to "${w.title}". Subscribers can now download it.`); }
+      catch (e) { msg('upErr', e.message); }
+      loadWebinars();
+    });
+    input.click();
+  }
   function btn(label, cls, fn) { const b = el('button', 'btn btn-sm ' + cls, label); b.type = 'button'; b.addEventListener('click', fn); return b; }
 
   // ---------- auth
@@ -242,13 +263,23 @@
     for (const w of webinars) {
       const tr = el('tr');
       tr.append(el('td', '', fmtDate(w.weekOf)));
-      const t = el('td'); t.append(el('div', '', w.title)); if (w.summary) t.append(el('div', 'muted', w.summary.slice(0, 120) + (w.summary.length > 120 ? '…' : ''))); tr.append(t);
+      const t = el('td'); t.append(el('div', '', w.title)); if (w.summary) t.append(el('div', 'muted', w.summary.slice(0, 120) + (w.summary.length > 120 ? '…' : '')));
+      t.append(el('div', 'muted pdf-line', w.pdf ? `10-minute PDF attached (${Math.max(1, Math.round(w.pdf.size / 1024))} KB, ${fmtDate(w.pdf.uploadedAt)})` : 'No 10-minute PDF yet'));
+      tr.append(t);
       const v = el('td'); const label = w.videoStatus + (w.encodeProgress != null && !w.ready && w.encodeProgress > 0 ? ` (${w.encodeProgress}%)` : '');
       v.append(el('span', 'badge ' + (w.ready ? 'badge-teal' : /Error|failed|Missing/.test(w.videoStatus) ? 'badge-red' : 'badge-amber'), label)); tr.append(v);
       const p = el('td'); p.append(el('span', 'badge ' + (w.published ? 'badge-teal' : 'badge-gray'), w.published ? (w.ready ? 'Yes' : 'When ready') : 'Hidden')); tr.append(p);
       const a = el('td'); const acts = el('div', 'actions');
       acts.append(btn('Preview', 'btn-outline', () => preview(w)));
       acts.append(btn('Edit', 'btn-ghost', () => openEdit(w)));
+      acts.append(btn(w.pdf ? 'Replace PDF' : 'Add PDF', w.pdf ? 'btn-ghost' : 'btn-outline', () => pickPdf(w)));
+      if (w.pdf) {
+        acts.append(btn('View PDF', 'btn-ghost', () => window.open(`/api/admin/webinars/${w.id}/pdf`, '_blank', 'noopener')));
+        acts.append(btn('Remove PDF', 'btn-danger', async () => {
+          if (!confirm(`Remove the 10-minute PDF from "${w.title}"?`)) return;
+          await api(`/api/admin/webinars/${w.id}/pdf`, { method: 'DELETE' }).catch((e) => alert(e.message)); loadWebinars();
+        }));
+      }
       acts.append(btn(w.published ? 'Hide' : 'Publish', 'btn-ghost', async () => { await post(`/api/admin/webinars/${w.id}`, { published: !w.published }, 'PATCH').catch((e) => alert(e.message)); loadWebinars(); }));
       if (/Waiting|failed/.test(w.videoStatus)) acts.append(btn('Upload file', 'btn-ghost', () => resumeUpload(w)));
       acts.append(btn('Remove', 'btn-danger', async () => {
@@ -331,9 +362,15 @@
         title: $('upTitle').value, weekOf: $('upWeek').value, summary: $('upSummary').value,
         topics: $('upTopics').value, published: $('upPublish').checked,
       });
+      const pdfFile = $('upPdf').files[0];
+      let pdfNote = '';
+      if (pdfFile) {
+        try { await uploadPdf(webinar.id, pdfFile); pdfNote = ' The 10-minute PDF is attached.'; }
+        catch (pe) { pdfNote = ` The PDF did not attach (${pe.message}); use "Add PDF" in the library to try again.`; }
+      }
       loadWebinars();
       startTus(file, creds, `${webinar.weekOf} | ${webinar.title}`, () => {
-        msg('upOk', `Uploaded. "${webinar.title}" is now processing and will ${webinar.published ? 'appear for clients automatically' : 'be ready to publish'} once finished.`);
+        msg('upOk', `Uploaded. "${webinar.title}" is now processing and will ${webinar.published ? 'appear for clients automatically' : 'be ready to publish'} once finished.${pdfNote}`);
         $('upForm').reset(); $('upWeek').value = mondayISO(); $('upPublish').checked = true; $('upProgressWrap').hidden = true; $('upBar').style.width = '0';
         loadWebinars();
       });
@@ -376,7 +413,7 @@
         const st = el('td'); st.append(el('span', 'badge ' + (!c.active ? 'badge-red' : c.passwordSet ? 'badge-teal' : 'badge-amber'), !c.active ? 'Suspended' : c.passwordSet ? 'Active' : 'Invited')); tr.append(st);
         const act = el('td');
         act.append(el('div', 'muted', `Last sign-in: ${fmtDT(c.lastLoginAt)}`));
-        act.append(el('div', 'muted', `Plays: ${c.views}${c.lastViewedAt ? ', last ' + fmtDT(c.lastViewedAt) : ''}`));
+        act.append(el('div', 'muted', `Plays: ${c.views}${c.lastViewedAt ? ', last ' + fmtDT(c.lastViewedAt) : ''} · PDF downloads: ${c.pdfDownloads || 0}`));
         const loc = el('div', 'muted', `Devices signed in: ${c.activeSessions} · Locations (30d): ${c.distinctIps30d}`);
         if (c.distinctIps30d > 3) loc.style.color = 'var(--red-700)';
         act.append(loc); tr.append(act);
