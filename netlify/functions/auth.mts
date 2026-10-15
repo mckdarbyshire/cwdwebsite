@@ -1,4 +1,5 @@
-// Client sign-in, sign-out, and first-time password setup from an invite link.
+// Client sign-in, sign-out, first-time password setup from an invite link,
+// and one-click access from the personal links in the weekly email.
 import type { Config, Context } from "@netlify/functions";
 import {
   clearMemberCookie,
@@ -14,6 +15,7 @@ import {
   publicUser,
   rateLimit,
   readInvite,
+  readMagicLink,
   readJson,
   saveUser,
   startMemberSession,
@@ -89,6 +91,25 @@ export default async (req: Request, context: Context) => {
       return json({ user: publicUser(user) }, 200, { "Set-Cookie": setCookie });
     }
 
+    // Personal links from the weekly email: the landing page posts the token here.
+    if (action === "magic" && req.method === "POST") {
+      const body = await readJson<{ token?: string; next?: string }>(req);
+      await rateLimit("magic-ip", ip || "unknown", 60, 15 * 60);
+      const link = await readMagicLink(str(body.token, 100));
+      if (!link) throw new HttpError(410, "This link has expired. Please sign in, or reply to the email for a fresh link.");
+      const { user, wid } = link;
+      if (!user.active) throw new HttpError(403, "This account is not currently active. Please contact CWD Research Consulting.");
+      const next = str(body.next, 10);
+      const dest = next === "pdf" ? `/members/?w=${encodeURIComponent(wid)}#pdf`
+        : next === "ask" ? `/members/?w=${encodeURIComponent(wid)}#ask`
+        : `/members/?w=${encodeURIComponent(wid)}`;
+      // Already signed in on this device as the same person: keep that session.
+      const current = await getMember(req);
+      if (current && current.user.id === user.id) return json({ next: dest });
+      const setCookie = await startMemberSession(user, req, ip);
+      return json({ next: dest }, 200, { "Set-Cookie": setCookie });
+    }
+
     return json({ error: "Not found" }, 404);
   } catch (err) {
     return handleError(err);
@@ -96,5 +117,5 @@ export default async (req: Request, context: Context) => {
 };
 
 export const config: Config = {
-  path: ["/api/auth/me", "/api/auth/login", "/api/auth/logout", "/api/auth/invite"],
+  path: ["/api/auth/me", "/api/auth/login", "/api/auth/logout", "/api/auth/invite", "/api/auth/magic"],
 };

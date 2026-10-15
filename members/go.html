@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Opening your webinar | CWD Research Consulting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/members/portal.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/index.html"><span class="brand-name">CWD Consulting</span><span class="brand-tag">Client Webinars</span></a>
+  </div>
+</header>
+<div class="auth-wrap">
+  <div class="auth-card">
+    <span class="kicker">Weekly Markets Webinar</span>
+    <h1 id="msgTitle">Opening your webinar&hellip;</h1>
+    <p class="lead" id="msgText">One moment while we sign you in.</p>
+    <div id="fallback" hidden>
+      <a class="btn btn-primary" href="/members/">Go to sign in</a>
+      <div class="auth-foot">Need a fresh link? Reply to this week's email or write to <a href="mailto:michael@cwdresearchconsulting.com?subject=Webinar%20access">michael@cwdresearchconsulting.com</a>.</div>
+    </div>
+  </div>
+</div>
+<footer class="footer-mini">&copy; CWD Research Consulting &middot; General market commentary for professional investors, not personal advice</footer>
+<script>
+(async function () {
+  // The token arrives in the URL fragment, so it never reaches a server log or an email link scanner.
+  const params = new URLSearchParams(location.hash.slice(1));
+  const token = params.get('t') || '';
+  const next = params.get('n') || 'watch';
+  history.replaceState(null, '', location.pathname);
+  const fail = (title, text) => {
+    document.getElementById('msgTitle').textContent = title;
+    document.getElementById('msgText').textContent = text;
+    document.getElementById('fallback').hidden = false;
+  };
+  if (!token) return fail('This link is incomplete', 'Please use the full link from your email, or sign in below.');
+  try {
+    const res = await fetch('/api/auth/magic', { method: 'POST', credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, next }) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) return fail('This link has expired', data.error || 'Please sign in, or reply to the email for a fresh link.');
+    location.replace(data.next || '/members/');
+  } catch (e) {
+    fail('Something went wrong', 'Please check your connection and try the link again, or sign in below.');
+  }
+})();
+</script>
+</body>
+</html>

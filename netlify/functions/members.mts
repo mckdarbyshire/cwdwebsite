@@ -3,6 +3,8 @@
 import type { Config, Context } from "@netlify/functions";
 import {
   db,
+  env,
+  escapeHtml,
   getCatalogue,
   handleError,
   HttpError,
@@ -10,6 +12,14 @@ import {
   pdfDownloadName,
   pdfKey,
   pdfResponse,
+  randomToken,
+  rateLimit,
+  readJson,
+  REQUEST_KINDS,
+  requestKey,
+  listRequests,
+  type ClientRequest,
+  type RequestKind,
   requireMember,
   saveCatalogue,
   saveUser,
@@ -17,6 +27,15 @@ import {
   type Webinar,
 } from "../lib/core.mts";
 import { getVideo, signedEmbedUrl } from "../lib/bunny.mts";
+import { mailReady, sendMail } from "../lib/mail.mts";
+
+const KIND_LABEL: Record<RequestKind, string> = { question: "Question", topic: "Topic for a future webinar", adhoc: "Ad hoc request" };
+
+// What a subscriber sees of their own requests (never the internal note).
+const clientView = (r: ClientRequest) => ({
+  id: r.id, kind: r.kind, webinarId: r.webinarId || null, webinarTitle: r.webinarTitle || null,
+  message: r.message, status: r.status, createdAt: r.createdAt, updatedAt: r.updatedAt,
+});
 
 // Published webinars only reach clients once Bunny has finished processing
 // them. Anything still pending is checked against Bunny (rarely more than one).
@@ -41,10 +60,43 @@ async function clientVisible(): Promise<Webinar[]> {
 
 export default async (req: Request, _context: Context) => {
   try {
-    if (req.method !== "GET") return json({ error: "Method not allowed" }, 405);
     const url = new URL(req.url);
     const action = url.pathname.replace(/^\/api\/members\/?/, "");
     const { user } = await requireMember(req);
+
+    if (action === "requests" && req.method === "POST") {
+      const body = await readJson(req);
+      await rateLimit("request-user", user.id, 15, 60 * 60);
+      const kind = str(body.kind, 20) as RequestKind;
+      if (!REQUEST_KINDS.includes(kind)) throw new HttpError(400, "Please choose what kind of request this is.");
+      const message = str(body.message, 4000);
+      if (message.length < 3) throw new HttpError(400, "Please write your question or request.");
+      const wid = str(body.webinarId, 64);
+      const webinar = wid ? (await getCatalogue()).find((w) => w.id === wid && w.published) : undefined;
+      const now = new Date().toISOString();
+      const r: ClientRequest = {
+        id: `${now.slice(0, 10)}-${randomToken(8)}`, uid: user.id, name: user.name, firm: user.firm, email: user.email,
+        kind, webinarId: webinar?.id, webinarTitle: webinar?.title, message, status: "new", createdAt: now, updatedAt: now,
+      };
+      await db().setJSON(requestKey(r.id), r);
+      if (mailReady()) {
+        // Best effort: a failed alert must not lose the request.
+        const to = env("REQUEST_ALERT_TO") || env("MAIL_FROM")!;
+        await sendMail({
+          to, saveToSentItems: false,
+          subject: `New ${KIND_LABEL[kind].toLowerCase()} from ${user.name} (${user.firm})`,
+          html: `<div style="font:15px/1.5 Calibri,Arial,sans-serif;color:#1C3E4D"><p><b>${escapeHtml(KIND_LABEL[kind])}</b> from ${escapeHtml(user.name)}, ${escapeHtml(user.firm)} (${escapeHtml(user.email)})${webinar ? `<br>About: ${escapeHtml(webinar.title)}` : ""}</p><p style="white-space:pre-wrap;border-left:3px solid #1E707A;padding-left:12px">${escapeHtml(message)}</p><p>Manage it in the webinar console under Requests.</p></div>`,
+        }).catch((err) => console.error("request alert failed", err));
+      }
+      return json({ request: clientView(r) }, 201);
+    }
+
+    if (req.method !== "GET") return json({ error: "Method not allowed" }, 405);
+
+    if (action === "requests") {
+      const mine = (await listRequests()).filter((r) => r.uid === user.id).map(clientView);
+      return json({ requests: mine });
+    }
 
     if (action === "webinars") {
       const published = await clientVisible();
@@ -92,5 +144,5 @@ export default async (req: Request, _context: Context) => {
 };
 
 export const config: Config = {
-  path: ["/api/members/webinars", "/api/members/play", "/api/members/pdf"],
+  path: ["/api/members/webinars", "/api/members/play", "/api/members/pdf", "/api/members/requests"],
 };

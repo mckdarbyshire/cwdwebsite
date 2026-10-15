@@ -73,6 +73,34 @@
     </div>
   </section>
 
+  <section class="ask" id="ask" hidden>
+    <div class="ask-head">
+      <div>
+        <h2>Questions and requests</h2>
+        <p class="sub">Follow up on anything in a webinar, suggest a topic for next week, or ask for an ad hoc piece of work. Michael will come back to you.</p>
+      </div>
+    </div>
+    <div class="ask-grid">
+      <form id="askForm" class="ask-form" novalidate>
+        <div class="alert alert-error" id="askErr" hidden></div>
+        <div class="alert alert-ok" id="askOk" hidden></div>
+        <fieldset class="kinds">
+          <legend>What would you like to do?</legend>
+          <label class="kind"><input type="radio" name="kind" value="question" checked><span><strong>Ask a question</strong><em>About something in a webinar</em></span></label>
+          <label class="kind"><input type="radio" name="kind" value="topic"><span><strong>Suggest a topic</strong><em>For next week's session</em></span></label>
+          <label class="kind"><input type="radio" name="kind" value="adhoc"><span><strong>Ad hoc request</strong><em>A piece of work for your firm</em></span></label>
+        </fieldset>
+        <div class="field" id="aboutWrap"><label for="askAbout">Which webinar is it about?</label><select id="askAbout"></select></div>
+        <div class="field"><label for="askMsg" id="askMsgLabel">Your question</label><textarea id="askMsg" maxlength="4000" required></textarea></div>
+        <button class="btn btn-primary" type="submit" id="askBtn">Send to CWD</button>
+      </form>
+      <div class="ask-list">
+        <h3>Your recent requests</h3>
+        <div id="myReqs"><p class="muted-p">Nothing yet. Anything you send will appear here with its progress.</p></div>
+      </div>
+    </div>
+  </section>
+
   <div id="archiveWrap" hidden>
     <div class="section-head">
       <h2>Archive</h2>
@@ -190,9 +218,65 @@
     $('emptyState').hidden = items.length > 0;
     $('feature').hidden = items.length === 0;
     $('archiveWrap').hidden = items.length < 2;
-    if (items.length) setFeature(items[0], true);
+    $('ask').hidden = false;
+    // ?w=<id> (from an email link) features that week; otherwise the latest.
+    const wanted = new URLSearchParams(location.search).get('w');
+    const pick = items.find((w) => w.id === wanted) || items[0];
+    if (pick) setFeature(pick, pick === items[0]);
     renderArchive();
+    fillAbout(); loadMine();
+    const h = location.hash;
+    if (h === '#ask') setTimeout(() => { $('ask').scrollIntoView({ behavior: 'smooth' }); $('askMsg').focus({ preventScroll: true }); }, 300);
+    if (h === '#pdf' && current && current.hasPdf) setTimeout(() => $('featPdf').click(), 300);
+    if (h) history.replaceState(null, '', location.pathname + location.search);
   }
+
+  // ---------- questions and requests
+  const KIND = { question: 'Question', topic: 'Topic suggestion', adhoc: 'Ad hoc request' };
+  const STATUS = { new: ['Received', 'badge-gray'], in_progress: ['In progress', 'badge-amber'], covering: ['Covering in a webinar', 'badge-teal'], answered: ['Answered', 'badge-teal'] };
+  const MSG_LABEL = { question: 'Your question', topic: 'What would you like Chris to cover?', adhoc: 'What do you need, and by when?' };
+  function fillAbout() {
+    const sel = $('askAbout'); sel.replaceChildren();
+    const general = el('option', '', 'General, not about a particular webinar'); general.value = ''; sel.append(general);
+    items.forEach((w) => { const o = el('option', '', `${fmtShort(w.weekOf)}: ${w.title}`); o.value = w.id; sel.append(o); });
+    sel.value = current ? current.id : '';
+  }
+  function kind() { return document.querySelector('input[name="kind"]:checked').value; }
+  document.querySelectorAll('input[name="kind"]').forEach((r) => r.addEventListener('change', () => {
+    $('askMsgLabel').textContent = MSG_LABEL[kind()];
+    $('aboutWrap').hidden = kind() !== 'question';
+  }));
+  async function loadMine() {
+    try {
+      const { requests } = await api('/api/members/requests');
+      const box = $('myReqs');
+      if (!requests.length) return;
+      box.replaceChildren(...requests.slice(0, 8).map((r) => {
+        const d = el('div', 'req');
+        const top = el('div', 'req-top');
+        top.append(el('span', 'req-kind', KIND[r.kind] || r.kind), el('span', 'badge ' + (STATUS[r.status] || STATUS.new)[1], (STATUS[r.status] || STATUS.new)[0]));
+        d.append(top);
+        d.append(el('div', 'req-msg', r.message.length > 220 ? r.message.slice(0, 220) + '…' : r.message));
+        d.append(el('div', 'req-meta', fmtShort(r.createdAt.slice(0, 10)) + (r.webinarTitle ? ' · ' + r.webinarTitle : '')));
+        return d;
+      }));
+    } catch {}
+  }
+  $('askForm').addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const err = $('askErr'), ok = $('askOk'); err.hidden = true; ok.hidden = true;
+    const btn = $('askBtn'); btn.disabled = true; btn.textContent = 'Sending…';
+    try {
+      const k = kind();
+      await api('/api/members/requests', { method: 'POST', body: JSON.stringify({ kind: k, message: $('askMsg').value, webinarId: k === 'question' ? $('askAbout').value : '' }) });
+      $('askMsg').value = '';
+      ok.textContent = 'Thank you, that has reached us. Michael will be in touch, and you can follow its progress here.'; ok.hidden = false;
+      loadMine();
+    } catch (e) {
+      if (e.status === 401) { show('signIn'); showErr('Your session has ended. Please sign in again.'); }
+      else { err.textContent = e.message; err.hidden = false; }
+    } finally { btn.disabled = false; btn.textContent = 'Send to CWD'; }
+  });
 
   function renderArchive() {
     const q = $('search').value.trim().toLowerCase();

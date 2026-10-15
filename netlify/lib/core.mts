@@ -80,6 +80,7 @@ export type Webinar = {
   lengthSec?: number;
   ready?: boolean; // true once Bunny has finished processing the video
   pdf?: WebinarPdf; // optional "This week in 10 minutes" summary
+  emailLog?: Record<string, string>; // user id -> when this week's email was sent to them
 };
 
 export type WebinarPdf = { name: string; size: number; uploadedAt: string };
@@ -329,7 +330,9 @@ export async function getMember(req: Request): Promise<{ user: User; sid: string
   if (!safeEqual(sig, hmac(`${uid}.${sid}.${expStr}`))) return null;
   if (Number(expStr) < Date.now() / 1000) return null;
   const user = await getUser(uid);
-  if (!user || !user.active || !user.passwordHash) return null;
+  // Sessions come only from a password sign-in or a personal email link, so a
+  // subscriber who has never set a password can still use the email links.
+  if (!user || !user.active) return null;
   const session = (user.sessions || []).find((s) => s.sid === sid);
   if (!session) return null;
   // Touch lastSeen at most every 10 minutes to limit writes.
@@ -401,4 +404,64 @@ export async function readInvite(token: string): Promise<{ user: User; key: stri
 
 export function publicUser(u: User) {
   return { id: u.id, email: u.email, name: u.name, firm: u.firm };
+}
+
+// ---------------------------------------------------------------- email links
+// Personal links in the weekly email sign the subscriber straight in. The token
+// travels in the URL fragment (never sent to a server or link scanner) and the
+// landing page posts it to /api/auth/magic. Links work repeatedly until expiry.
+export const MAGIC_TTL_DAYS = 14;
+
+export async function createMagicLink(user: User, webinarId: string): Promise<string> {
+  const token = randomToken(24);
+  const expiresAt = new Date(Date.now() + MAGIC_TTL_DAYS * 864e5).toISOString();
+  await db().setJSON(`magic/${sha256(token)}`, { uid: user.id, wid: webinarId, expiresAt });
+  return token;
+}
+
+export async function readMagicLink(token: string): Promise<{ user: User; wid: string } | null> {
+  if (!/^[A-Za-z0-9_-]{20,80}$/.test(token)) return null;
+  const rec = (await db().get(`magic/${sha256(token)}`, { type: "json" })) as { uid: string; wid: string; expiresAt: string } | null;
+  if (!rec || Date.parse(rec.expiresAt) < Date.now()) return null;
+  const user = await getUser(rec.uid);
+  return user ? { user, wid: rec.wid } : null;
+}
+
+export function siteUrl(req: Request): string {
+  return env("SITE_URL") || new URL(req.url).origin;
+}
+
+// ---------------------------------------------------------------- questions & requests
+export type RequestKind = "question" | "topic" | "adhoc";
+export type RequestStatus = "new" | "in_progress" | "covering" | "answered";
+export const REQUEST_KINDS: RequestKind[] = ["question", "topic", "adhoc"];
+export const REQUEST_STATUSES: RequestStatus[] = ["new", "in_progress", "covering", "answered"];
+
+export type ClientRequest = {
+  id: string;
+  uid: string;
+  name: string;
+  firm: string;
+  email: string;
+  kind: RequestKind;
+  webinarId?: string;
+  webinarTitle?: string;
+  message: string;
+  status: RequestStatus;
+  note?: string; // internal, staff only
+  createdAt: string;
+  updatedAt: string;
+};
+
+export const requestKey = (id: string) => `requests/${id}`;
+
+export async function listRequests(): Promise<ClientRequest[]> {
+  const store = db();
+  const { blobs } = (await store.list({ prefix: "requests/" })) as { blobs: { key: string }[] };
+  const all = await Promise.all(blobs.map((b) => store.get(b.key, { type: "json" }) as Promise<ClientRequest | null>));
+  return all.filter((r): r is ClientRequest => !!r).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+export function escapeHtml(s: string): string {
+  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }

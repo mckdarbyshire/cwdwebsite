@@ -42,6 +42,7 @@
   <div class="alert alert-warn" id="setupWarn" hidden></div>
   <nav class="tabs" role="tablist">
     <button class="tab active" data-tab="webinars" type="button">Webinars</button>
+    <button class="tab" data-tab="requests" type="button">Requests <span class="badge badge-teal" id="reqBadge" hidden></span></button>
     <button class="tab" data-tab="clients" type="button">Clients</button>
     <button class="tab" data-tab="setup" type="button">Setup</button>
   </nav>
@@ -89,6 +90,23 @@
         <p class="sub" style="margin-bottom:12px">For recordings uploaded directly in the Bunny dashboard. Add one to give it a title, date and summary.</p>
         <div class="table-wrap"><table><thead><tr><th>Uploaded</th><th>Name in storage</th><th>Status</th><th></th></tr></thead><tbody id="uBody"></tbody></table></div>
       </div>
+    </div>
+  </section>
+
+  <!-- REQUESTS -->
+  <section data-panel="requests" hidden>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+        <div><h2>Questions and requests</h2><p class="sub">Sent by subscribers from the client library. Update the status as you go: subscribers see it next to their request. Notes are internal and never shown to clients.</p></div>
+        <div class="actions">
+          <select id="reqFilter" style="width:auto"><option value="open">Open</option><option value="all">All</option></select>
+          <button class="btn btn-ghost btn-sm" id="refreshR" type="button">Refresh</button>
+        </div>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Received</th><th>From</th><th>Request</th><th>Status and note</th><th>Actions</th></tr></thead>
+        <tbody id="rBody"></tbody>
+      </table></div>
     </div>
   </section>
 
@@ -156,6 +174,25 @@
   </form>
 </dialog>
 
+<dialog id="emailDlg">
+  <div class="dialog-body">
+    <h2 class="serif" style="font-size:1.25rem;margin-bottom:6px">Email subscribers</h2>
+    <p class="sub" id="emailIntro" style="color:var(--gray-600);font-size:.9rem;margin-bottom:14px"></p>
+    <div class="alert alert-error" id="emailErr" hidden></div>
+    <div class="alert alert-ok" id="emailOk" hidden></div>
+    <div class="table-wrap" style="max-height:300px;overflow:auto"><table>
+      <thead><tr><th style="width:36px"><input type="checkbox" id="emailAll" aria-label="Select all"></th><th>Subscriber</th><th>This week</th></tr></thead>
+      <tbody id="emailBody"></tbody>
+    </table></div>
+    <div id="emailProgressWrap" hidden><div class="progress"><div id="emailBar"></div></div><div class="hint" id="emailStatus"></div></div>
+    <div class="dialog-actions" style="margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-ghost" type="button" id="emailClose">Close</button>
+      <button class="btn btn-outline" type="button" id="emailTest">Send a test to me</button>
+      <button class="btn btn-primary" type="button" id="emailSend">Send</button>
+    </div>
+  </div>
+</dialog>
+
 <dialog id="previewDlg">
   <div class="dialog-body">
     <div class="player" id="previewPlayer"></div>
@@ -208,7 +245,7 @@
 
   // ---------- auth
   async function boot() {
-    try { await api('/api/admin/me'); show('console'); loadStatus(); loadWebinars(); loadClients(); }
+    try { await api('/api/admin/me'); show('console'); loadStatus(); loadWebinars(); loadClients(); loadRequests(); }
     catch { show('login'); $('adminPw').focus(); }
   }
   $('loginForm').addEventListener('submit', async (e) => {
@@ -233,6 +270,10 @@
         ['BUNNY_API_KEY', s.bunny.apiKey, 'Bunny Stream library API key (uploads and listing)'],
         ['BUNNY_TOKEN_KEY', s.bunny.tokenKey, 'Bunny embed token authentication key (secures playback)'],
         ['SITE_URL', !!s.siteUrl, 'Public site address used in access links (optional)'],
+        ['MS_TENANT_ID', s.mail && s.mail.tenantId, 'Microsoft 365 tenant (directory) ID, for sending the weekly email'],
+        ['MS_CLIENT_ID', s.mail && s.mail.clientId, 'Application (client) ID of the CWD webinar mailer app registration'],
+        ['MS_CLIENT_SECRET', s.mail && s.mail.clientSecret, 'Client secret of that app registration'],
+        ['MAIL_FROM', !!(s.mail && s.mail.from), 'Mailbox the weekly email is sent from' + (s.mail && s.mail.from ? ': ' + s.mail.from : ', e.g. michael@cwdresearchconsulting.com')],
       ];
       $('setupList').replaceChildren(...rows.map(([k, ok, d]) => {
         const li = el('li'); li.append(el('span', 'badge ' + (ok ? 'badge-teal' : 'badge-red'), ok ? 'Set' : 'Missing'));
@@ -264,6 +305,8 @@
       const tr = el('tr');
       tr.append(el('td', '', fmtDate(w.weekOf)));
       const t = el('td'); t.append(el('div', '', w.title)); if (w.summary) t.append(el('div', 'muted', w.summary.slice(0, 120) + (w.summary.length > 120 ? '…' : '')));
+      const sent = Object.keys(w.emailLog || {}).length;
+      if (sent) t.append(el('div', 'muted', `Emailed to ${sent} subscriber${sent === 1 ? '' : 's'}`));
       t.append(el('div', 'muted pdf-line', w.pdf ? `10-minute PDF attached (${Math.max(1, Math.round(w.pdf.size / 1024))} KB, ${fmtDate(w.pdf.uploadedAt)})` : 'No 10-minute PDF yet'));
       tr.append(t);
       const v = el('td'); const label = w.videoStatus + (w.encodeProgress != null && !w.ready && w.encodeProgress > 0 ? ` (${w.encodeProgress}%)` : '');
@@ -272,6 +315,7 @@
       const a = el('td'); const acts = el('div', 'actions');
       acts.append(btn('Preview', 'btn-outline', () => preview(w)));
       acts.append(btn('Edit', 'btn-ghost', () => openEdit(w)));
+      if (w.published && w.ready) acts.append(btn('Email subscribers', 'btn-outline', () => openEmail(w)));
       acts.append(btn(w.pdf ? 'Replace PDF' : 'Add PDF', w.pdf ? 'btn-ghost' : 'btn-outline', () => pickPdf(w)));
       if (w.pdf) {
         acts.append(btn('View PDF', 'btn-ghost', () => window.open(`/api/admin/webinars/${w.id}/pdf`, '_blank', 'noopener')));
@@ -387,6 +431,106 @@
     input.click();
   }
   window.addEventListener('beforeunload', (e) => { if (upload) { e.preventDefault(); e.returnValue = ''; } });
+
+  // ---------- questions and requests
+  let requests = [];
+  const KIND = { question: 'Question', topic: 'Topic for a webinar', adhoc: 'Ad hoc request' };
+  const STATUS = { new: 'New', in_progress: 'In progress', covering: 'Covering in a webinar', answered: 'Answered' };
+  async function loadRequests() {
+    try { requests = (await api('/api/admin/requests')).requests; renderRequests(); } catch {}
+  }
+  $('refreshR').addEventListener('click', loadRequests);
+  $('reqFilter').addEventListener('change', renderRequests);
+  function renderRequests() {
+    const open = requests.filter((r) => r.status !== 'answered');
+    const fresh = requests.filter((r) => r.status === 'new').length;
+    $('reqBadge').textContent = fresh; $('reqBadge').hidden = !fresh;
+    const list = $('reqFilter').value === 'all' ? requests : open;
+    const body = $('rBody'); body.replaceChildren();
+    if (!list.length) { const tr = el('tr'); const td = el('td', '', $('reqFilter').value === 'all' ? 'No requests yet.' : 'Nothing open. Switch to "All" to see answered requests.'); td.colSpan = 5; td.style.color = 'var(--gray-500)'; tr.append(td); body.append(tr); return; }
+    for (const r of list) {
+      const tr = el('tr');
+      tr.append(el('td', '', fmtDT(r.createdAt)));
+      const who = el('td'); who.append(el('div', '', r.name), el('div', 'muted', r.firm), el('div', 'muted', r.email)); tr.append(who);
+      const what = el('td'); what.append(el('span', 'badge ' + (r.kind === 'adhoc' ? 'badge-amber' : 'badge-teal'), KIND[r.kind] || r.kind));
+      if (r.webinarTitle) what.append(el('div', 'muted', 'About: ' + r.webinarTitle));
+      const msgEl = el('div', '', r.message); msgEl.style.whiteSpace = 'pre-wrap'; msgEl.style.marginTop = '6px'; msgEl.style.maxWidth = '420px'; what.append(msgEl); tr.append(what);
+      const st = el('td'); const sel = el('select'); sel.style.marginBottom = '8px';
+      Object.entries(STATUS).forEach(([k, v]) => { const o = el('option', '', v); o.value = k; sel.append(o); }); sel.value = r.status;
+      const note = el('textarea'); note.placeholder = 'Internal note (not shown to the client)'; note.value = r.note || ''; note.style.minHeight = '64px'; note.style.fontSize = '.85rem';
+      st.append(sel, note); tr.append(st);
+      const a = el('td'); const acts = el('div', 'actions');
+      acts.append(btn('Save', 'btn-outline', async () => {
+        try { await post(`/api/admin/requests/${r.id}`, { status: sel.value, note: note.value }, 'PATCH'); loadRequests(); } catch (e) { alert(e.message); }
+      }));
+      const reply = el('a', 'btn btn-sm btn-ghost', 'Reply by email');
+      const subj = r.kind === 'question' ? 'Your question' : r.kind === 'topic' ? 'Your topic suggestion' : 'Your request';
+      reply.href = `mailto:${encodeURIComponent(r.email)}?subject=${encodeURIComponent(subj + (r.webinarTitle ? ': ' + r.webinarTitle : ''))}&body=${encodeURIComponent('Dear ' + r.name.split(' ')[0] + ',\n\n\n\nYou wrote:\n> ' + r.message.replace(/\n/g, '\n> '))}`;
+      acts.append(reply);
+      acts.append(btn('Delete', 'btn-danger', async () => {
+        if (!confirm('Delete this request permanently?')) return;
+        await api(`/api/admin/requests/${r.id}`, { method: 'DELETE' }).catch((e) => alert(e.message)); loadRequests();
+      }));
+      a.append(acts); tr.append(a); body.append(tr);
+    }
+  }
+
+  // ---------- weekly email
+  let emailing = null, sending = false;
+  async function openEmail(w) {
+    emailing = w; msg('emailErr'); msg('emailOk'); $('emailProgressWrap').hidden = true; $('emailBody').replaceChildren();
+    $('emailIntro').textContent = 'Loading subscribers…'; $('emailDlg').showModal();
+    try {
+      const data = await post(`/api/admin/webinars/${w.id}/email`, { action: 'recipients' });
+      emailing.recipients = data.recipients;
+      $('emailIntro').textContent = `"${w.title}" (week of ${fmtDate(w.weekOf)}). Each person gets their own one-click links, valid for 14 days. Sent from ${data.from || 'MAIL_FROM (not set)'}, one about every 2 seconds to stay within Microsoft 365's limits. Keep this window open while it sends.`;
+      if (!data.mailReady) msg('emailErr', 'Email is not set up yet. Add the Microsoft 365 settings in Netlify (see the Setup tab).');
+      $('emailSend').disabled = !data.mailReady; $('emailTest').disabled = !data.mailReady;
+      for (const r of data.recipients) {
+        const tr = el('tr'); const c = el('td'); const cb = el('input'); cb.type = 'checkbox'; cb.value = r.id; cb.checked = !r.sentAt; cb.className = 'emailPick'; c.append(cb); tr.append(c);
+        const who = el('td'); who.append(el('div', '', `${r.name} (${r.firm})`), el('div', 'muted', r.email)); tr.append(who);
+        const st = el('td'); st.id = 'est-' + r.id; st.append(el('span', 'badge ' + (r.sentAt ? 'badge-teal' : 'badge-gray'), r.sentAt ? 'Sent ' + fmtDT(r.sentAt) : 'Not sent')); tr.append(st);
+        $('emailBody').append(tr);
+      }
+      if (!data.recipients.length) { const tr = el('tr'); const td = el('td', '', 'No active subscribers yet.'); td.colSpan = 3; tr.append(td); $('emailBody').append(tr); }
+      updateSendLabel();
+    } catch (e) { msg('emailErr', e.message); }
+  }
+  function picks() { return [...document.querySelectorAll('.emailPick:checked')].map((c) => c.value); }
+  function updateSendLabel() { const n = picks().length; $('emailSend').textContent = n ? `Send to ${n} subscriber${n === 1 ? '' : 's'}` : 'Send'; if (!sending) $('emailSend').disabled = !n || $('emailTest').disabled; }
+  $('emailBody').addEventListener('change', updateSendLabel);
+  $('emailAll').addEventListener('change', () => { document.querySelectorAll('.emailPick').forEach((c) => (c.checked = $('emailAll').checked)); updateSendLabel(); });
+  $('emailClose').addEventListener('click', () => { if (sending && !confirm('Sending is in progress. Stop and close?')) return; sending = false; $('emailDlg').close(); loadWebinars(); });
+  $('emailTest').addEventListener('click', async () => {
+    msg('emailErr'); msg('emailOk');
+    try { const r = await post(`/api/admin/webinars/${emailing.id}/email`, { action: 'test' }); msg('emailOk', `Test sent to ${r.to}. Check how it looks before sending to subscribers.`); }
+    catch (e) { msg('emailErr', e.message); }
+  });
+  const pause = (ms) => new Promise((r) => setTimeout(r, ms));
+  $('emailSend').addEventListener('click', async () => {
+    const ids = picks(); if (!ids.length) return;
+    if (!confirm(`Send this week's email to ${ids.length} subscriber${ids.length === 1 ? '' : 's'}?`)) return;
+    sending = true; msg('emailErr'); msg('emailOk'); $('emailSend').disabled = true; $('emailTest').disabled = true;
+    $('emailProgressWrap').hidden = false; let done = 0, failed = 0;
+    for (const id of ids) {
+      if (!sending) break;
+      const cell = $('est-' + id);
+      try {
+        await post(`/api/admin/webinars/${emailing.id}/email`, { action: 'send', userId: id });
+        cell.replaceChildren(el('span', 'badge badge-teal', 'Sent just now'));
+        document.querySelector(`.emailPick[value="${id}"]`).checked = false;
+      } catch (e) {
+        failed++; cell.replaceChildren(el('span', 'badge badge-red', 'Failed'), el('div', 'muted', e.message));
+        if (/limiting/.test(e.message)) await pause(60000);
+      }
+      done++; $('emailBar').style.width = (done / ids.length * 100).toFixed(0) + '%';
+      $('emailStatus').textContent = `${done} of ${ids.length} processed${failed ? `, ${failed} failed` : ''}. Keep this window open.`;
+      if (done < ids.length) await pause(2100);
+    }
+    sending = false; $('emailTest').disabled = false; updateSendLabel();
+    $('emailStatus').textContent = `Finished: ${done - failed} sent${failed ? `, ${failed} failed (tick them and send again)` : ''}.`;
+    if (!failed) msg('emailOk', 'All done. Each email also appears in your Sent Items.');
+  });
 
   // ---------- clients
   async function loadClients() {

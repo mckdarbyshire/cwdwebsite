@@ -4,6 +4,13 @@ import {
   assertSameOrigin,
   clearAdminCookie,
   createInvite,
+  createMagicLink,
+  type ClientRequest,
+  listRequests,
+  REQUEST_STATUSES,
+  requestKey,
+  type RequestStatus,
+  siteUrl,
   db,
   emailKey,
   env,
@@ -45,6 +52,8 @@ import {
   STATUS_LABEL,
   uploadCredentials,
 } from "../lib/bunny.mts";
+import { mailConfigured, mailReady, sendMail } from "../lib/mail.mts";
+import { weeklyEmailHtml, weeklySubject } from "../lib/weekly-email.mts";
 
 const now = () => new Date().toISOString();
 
@@ -118,6 +127,7 @@ export default async (req: Request, context: Context) => {
         bunny: bunnyConfigured(),
         siteUrl: env("SITE_URL") || null,
         maxSessionsPerUser: Number(env("MAX_SESSIONS_PER_USER") || 3),
+        mail: mailConfigured(),
       });
     }
 
@@ -197,6 +207,29 @@ export default async (req: Request, context: Context) => {
         await saveUser(u);
       }
       return json({ updated: users.length });
+    }
+
+    // ------------------------------------------------ questions & requests
+    if (resource === "requests") {
+      if (!id && m === "GET") return json({ requests: await listRequests() });
+      const r = id && /^[A-Za-z0-9_-]{8,64}$/.test(id) ? ((await db().get(requestKey(id), { type: "json" })) as ClientRequest | null) : null;
+      if (!r) throw new HttpError(404, "Request not found.");
+      if (!sub && m === "PATCH") {
+        const body = await readJson(req);
+        if (body.status !== undefined) {
+          const st = str(body.status, 20) as RequestStatus;
+          if (!REQUEST_STATUSES.includes(st)) throw new HttpError(400, "Unknown status.");
+          r.status = st;
+        }
+        if (body.note !== undefined) r.note = str(body.note, 4000);
+        r.updatedAt = now();
+        await db().setJSON(requestKey(r.id), r);
+        return json({ request: r });
+      }
+      if (!sub && m === "DELETE") {
+        await db().delete(requestKey(r.id));
+        return json({ ok: true });
+      }
     }
 
     // ------------------------------------------------ webinars
@@ -312,6 +345,50 @@ export default async (req: Request, context: Context) => {
         w.updatedAt = now();
         await saveCatalogue(catalogue);
         return json({ webinar: w });
+      }
+
+      // Weekly email: the console asks for the recipient list, then sends one
+      // email per call, spaced out to stay inside Microsoft 365's 30-a-minute limit.
+      if (sub === "email" && m === "POST") {
+        const body = await readJson(req);
+        const action = str(body.action, 20);
+        if (!w.published || !w.ready) throw new HttpError(400, "Publish this webinar and let the video finish processing before emailing it.");
+        if (action === "recipients") {
+          const users = (await listUsers()).filter((u) => u.active);
+          users.sort((a, b) => a.firm.localeCompare(b.firm) || a.name.localeCompare(b.name));
+          return json({
+            mailReady: mailReady(),
+            from: env("MAIL_FROM") || null,
+            recipients: users.map((u) => ({ id: u.id, name: u.name, firm: u.firm, email: u.email, sentAt: w.emailLog?.[u.id] || null })),
+          });
+        }
+        const site = siteUrl(req);
+        if (action === "test") {
+          const to = env("MAIL_FROM");
+          if (!to) throw new HttpError(503, "MAIL_FROM is not set in Netlify.");
+          const plain = `${site}/members/?w=${encodeURIComponent(w.id)}`;
+          await sendMail({
+            to, saveToSentItems: false, subject: `[TEST] ${weeklySubject(w)}`,
+            html: weeklyEmailHtml({ w, firstName: "Michael", test: true, links: { watch: plain, pdf: w.pdf ? plain : undefined, ask: plain + "#ask" } }),
+          });
+          return json({ ok: true, to });
+        }
+        if (action === "send") {
+          const u = await getUser(str(body.userId, 64));
+          if (!u || !u.active) throw new HttpError(404, "Subscriber not found or not active.");
+          const token = await createMagicLink(u, w.id);
+          const go = (n: string) => `${site}/members/go.html#t=${token}&n=${n}`;
+          await sendMail({
+            to: u.email, toName: u.name, subject: weeklySubject(w),
+            html: weeklyEmailHtml({ w, firstName: u.name.split(" ")[0] || u.name, links: { watch: go("watch"), pdf: w.pdf ? go("pdf") : undefined, ask: go("ask") } }),
+          });
+          // re-read so parallel sends don't overwrite each other's log entries
+          const fresh = await getCatalogue();
+          const fw = fresh.find((x) => x.id === w.id);
+          if (fw) { fw.emailLog = { ...(fw.emailLog || {}), [u.id]: now() }; await saveCatalogue(fresh); }
+          return json({ ok: true, sentAt: now() });
+        }
+        throw new HttpError(400, "Unknown email action.");
       }
 
       if (!sub && m === "DELETE") {
