@@ -38,7 +38,7 @@ ${testBanner}
 </td></tr>
 <tr><td style="padding:8px 28px 22px 28px">
   <table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background:${TEAL};border-radius:8px">
-    <a href="${e(links.watch)}" style="display:inline-block;padding:14px 26px;color:#FFFFFF;font:700 16px ${FONT};text-decoration:none">Watch this week's webinar &#9654;</a>
+    <a href="${e(links.watch)}" style="display:inline-block;padding:13px 26px 13px 16px;color:#FFFFFF;font:700 16px/24px ${FONT};text-decoration:none"><span style="display:inline-block;width:24px;height:24px;border-radius:12px;background:#FFFFFF;color:${TEAL};font:9px/24px Arial, Helvetica, sans-serif;text-align:center;vertical-align:middle;text-indent:2px;mso-line-height-rule:exactly">&#9654;&#65038;</span><span style="display:inline-block;vertical-align:middle;padding-left:12px">Watch this week's webinar</span></a>
   </td></tr></table>
   <div style="color:${MUTED};font:13px ${FONT};padding-top:10px">One click, no password needed. You can also browse every past session.</div>
 </td></tr>
