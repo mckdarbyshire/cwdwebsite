@@ -14,3 +14,16 @@
     X-Robots-Tag = "noindex, nofollow"
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-Content-Type-Options = "nosniff"
+
+# The CIO's Diary podcast was replaced by the Weekly Markets Webinar (Oct 2026)
+[[redirects]]
+  from = "/podcast.html"
+  to = "/webinar.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/podcast"
+  to = "/webinar.html"
+  status = 301
+  force = true
